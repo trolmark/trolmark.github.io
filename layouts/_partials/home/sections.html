@@ -1,6 +1,6 @@
 {{ $posts := where .Site.RegularPages "Section" "posts" }}
 {{ with $posts }}
-  <section class="container list">
+  <section class="container list home-posts">
     <header>
       <h1 class="title">
         <a class="title-link" href="{{ "posts/" | relURL }}">Posts</a>

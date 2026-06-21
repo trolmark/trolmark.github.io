@@ -389,6 +389,17 @@ table tr:last-child td {
   border: 1px solid var(--border);
 }
 
+.home-posts {
+  max-width: 78rem;
+  margin-top: 10rem;
+  text-align: center;
+}
+
+.home-posts ul {
+  display: inline-block;
+  text-align: left;
+}
+
 @media (max-width: 900px) {
   body {
     font-size: 1.6em;
@@ -436,6 +447,10 @@ table tr:last-child td {
   .wide-figure {
     width: 100%;
     margin: 2.4rem 0;
+  }
+
+  .home-posts {
+    margin-top: 6rem;
   }
 
   .compact-image-grid,
