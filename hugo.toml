@@ -1,4 +1,4 @@
-baseURL = "http://localhost:1313/"
+baseURL = "https://trolmark.github.io/"
 title = "Andrii's Notes"
 theme = "hugo-coder"
 locale = "en-us"
