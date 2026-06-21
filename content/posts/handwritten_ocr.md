@@ -1,7 +1,7 @@
 +++
 title = "Building a Compact Handwritten OCR Pipeline"
 date = 2026-06-18
-draft = true
+draft = false
 tags = ["OCR", "handwriting", "computer-vision", "deep-learning"]
 categories = ["engineering"]
 series = ["handwritten-ocr"]

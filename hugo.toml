@@ -47,20 +47,6 @@ series = "series"
 tag = "tags"
 author = "authors"
 
-[[params.social]]
-name = "GitHub"
-icon = "fa-brands fa-github fa-2x"
-weight = 1
-url = "https://github.com/your-github-username/"
-
-[[params.social]]
-name = "RSS"
-icon = "fa-solid fa-rss fa-2x"
-weight = 2
-url = "/index.xml"
-rel = "alternate"
-type = "application/rss+xml"
-
 [[menu.main]]
 name = "Posts"
 weight = 1

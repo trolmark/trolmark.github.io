@@ -1,19 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
-  <title>
-  Building a Compact Handwritten OCR Pipeline · Andrii&#39;s Notes
-</title>
-  <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="light dark">
-
-
-
-
-<meta name="author" content="Andrii">
-<meta name="description" content="
+<!doctype html><html lang=en><head><title>Building a Compact Handwritten OCR Pipeline · Andrii's Notes</title><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=color-scheme content="light dark"><meta name=author content="Andrii"><meta name=description content="
   Introduction
   
     
@@ -31,201 +16,26 @@ on document AI: page detection, document classification, image
 enhancement. Handwritten-text recognition, though, was a piece of the
 stack I had never built end-to-end myself. I treated this dataset as a
 chance to fill that gap while staying inside the constraints I optimize
-for at work.">
-<meta name="keywords" content="blog,software engineering,research,technical writing">
-
-
-
-	<meta name="twitter:card" content="summary">
-	<meta name="twitter:title" content="Building a Compact Handwritten OCR Pipeline">
-	<meta name="twitter:description" content="Introduction Link to heading A while back, the Handwritten to Data Kaggle competition focused on Ukrainian handwriting recognition. The dataset is publicly available on Hugging Face as UkrainianCatholicUniversity/rukopys.
-Part of my day job is on the deployment side of ML — porting and optimizing models to run on mobile phones, where the recurring questions are “does this fit in memory?”, “does it hit the latency budget?”, and “does it run on the target hardware?”. Within that, I work mostly on document AI: page detection, document classification, image enhancement. Handwritten-text recognition, though, was a piece of the stack I had never built end-to-end myself. I treated this dataset as a chance to fill that gap while staying inside the constraints I optimize for at work.">
-
-<meta property="og:url" content="http://localhost:1313/posts/handwritten_ocr/">
-	<meta property="og:site_name" content="Andrii&#39;s Notes">
-	<meta property="og:title" content="Building a Compact Handwritten OCR Pipeline">
-	<meta property="og:description" content="Introduction Link to heading A while back, the Handwritten to Data Kaggle competition focused on Ukrainian handwriting recognition. The dataset is publicly available on Hugging Face as UkrainianCatholicUniversity/rukopys.
-Part of my day job is on the deployment side of ML — porting and optimizing models to run on mobile phones, where the recurring questions are “does this fit in memory?”, “does it hit the latency budget?”, and “does it run on the target hardware?”. Within that, I work mostly on document AI: page detection, document classification, image enhancement. Handwritten-text recognition, though, was a piece of the stack I had never built end-to-end myself. I treated this dataset as a chance to fill that gap while staying inside the constraints I optimize for at work.">
-	<meta property="og:locale" content="en_us">
-	<meta property="og:type" content="article">
-		<meta property="article:section" content="posts">
-		<meta property="article:published_time" content="2026-06-18T00:00:00+00:00">
-		<meta property="article:modified_time" content="2026-06-18T00:00:00+00:00">
-		<meta property="article:tag" content="OCR">
-		<meta property="article:tag" content="Handwriting">
-		<meta property="article:tag" content="Computer-Vision">
-		<meta property="article:tag" content="Deep-Learning">
-
-
-
-
-<link rel="canonical" href="http://localhost:1313/posts/handwritten_ocr/">
-
-
-<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-
-
-  
-  
-  <link rel="stylesheet" href="/css/coder.css" media="screen">
-
-
-
-
-
-
-
-
-
-  
-  
-    
-      <link rel="stylesheet" href="/css/custom.css" media="screen">
-    
-  
-
-
-
-
-
-<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
-<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
-<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
-
-<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
-
-
-
-
-
-
-
-
-
-
-</head>
-
-
-
-
-<body class="preload-transitions colorscheme-light">
-  
-<div class="float-container">
-    <a id="dark-mode-toggle" class="colorscheme-toggle">
-        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
-    </a>
-</div>
-
-
-  <main class="wrapper">
-    <nav class="navigation">
-  <section class="container">
-    
-    <a class="navigation-title" href="http://localhost:1313/">
-      Andrii&#39;s Notes
-    </a>
-    
-    
-      <input type="checkbox" id="menu-toggle" />
-      <label class="menu-button float-right" for="menu-toggle">
-        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
-      </label>
-      <ul class="navigation-list">
-        
-          
-            <li class="navigation-item">
-              <a class="navigation-link " href="/posts/">Posts</a>
-            </li>
-          
-            <li class="navigation-item">
-              <a class="navigation-link " href="/tags/">Tags</a>
-            </li>
-          
-            <li class="navigation-item">
-              <a class="navigation-link " href="/about/">About</a>
-            </li>
-          
-        
-        
-      </ul>
-    
-  </section>
-</nav>
-
-
-    <div class="content">
-      
-  <section class="container post">
-    <article>
-      <header>
-        <div class="post-title">
-          <h1 class="title">
-            <a class="title-link" href="http://localhost:1313/posts/handwritten_ocr/">
-              Building a Compact Handwritten OCR Pipeline
-            </a>
-          </h1>
-        </div>
-        <div class="post-meta">
-          <div class="date">
-            <span class="posted-on">
-              <i class="fa-solid fa-calendar" aria-hidden="true"></i>
-              <time datetime="2026-06-18T00:00:00Z">
-                June 2026
-              </time>
-            </span>
-            <span class="reading-time">
-              <i class="fa-solid fa-clock" aria-hidden="true"></i>
-              28-minute read
-            </span>
-          </div>
-          
-          <div class="categories">
-  <i class="fa-solid fa-folder" aria-hidden="true"></i>
-    <a href="/categories/engineering/">Engineering</a></div>
-
-          <div class="tags">
-  <i class="fa-solid fa-tag" aria-hidden="true"></i>
-    <span class="tag">
-      <a href="/tags/ocr/">OCR</a>
-    </span>
-      <span class="separator">•</span>
-    <span class="tag">
-      <a href="/tags/handwriting/">Handwriting</a>
-    </span>
-      <span class="separator">•</span>
-    <span class="tag">
-      <a href="/tags/computer-vision/">Computer-Vision</a>
-    </span>
-      <span class="separator">•</span>
-    <span class="tag">
-      <a href="/tags/deep-learning/">Deep-Learning</a>
-    </span></div>
-
-        </div>
-      </header>
-
-      
-
-
-      <div class="post-content">
-        
-        <h2 id="introduction">
-  Introduction
-  <a class="heading-link" href="#introduction">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<p>A while back, the <a href="https://www.kaggle.com/competitions/handwritten-to-data" title="Handwritten to Data"  class="external-link" target="_blank" rel="noopener">Handwritten to Data</a> Kaggle
+for at work."><meta name=keywords content="blog,software engineering,research,technical writing"><meta name=twitter:card content="summary"><meta name=twitter:title content="Building a Compact Handwritten OCR Pipeline"><meta name=twitter:description content="Introduction Link to heading A while back, the Handwritten to Data Kaggle competition focused on Ukrainian handwriting recognition. The dataset is publicly available on Hugging Face as UkrainianCatholicUniversity/rukopys.
+Part of my day job is on the deployment side of ML — porting and optimizing models to run on mobile phones, where the recurring questions are “does this fit in memory?”, “does it hit the latency budget?”, and “does it run on the target hardware?”. Within that, I work mostly on document AI: page detection, document classification, image enhancement. Handwritten-text recognition, though, was a piece of the stack I had never built end-to-end myself. I treated this dataset as a chance to fill that gap while staying inside the constraints I optimize for at work."><meta property="og:url" content="https://trolmark.github.io/posts/handwritten_ocr/"><meta property="og:site_name" content="Andrii's Notes"><meta property="og:title" content="Building a Compact Handwritten OCR Pipeline"><meta property="og:description" content="Introduction Link to heading A while back, the Handwritten to Data Kaggle competition focused on Ukrainian handwriting recognition. The dataset is publicly available on Hugging Face as UkrainianCatholicUniversity/rukopys.
+Part of my day job is on the deployment side of ML — porting and optimizing models to run on mobile phones, where the recurring questions are “does this fit in memory?”, “does it hit the latency budget?”, and “does it run on the target hardware?”. Within that, I work mostly on document AI: page detection, document classification, image enhancement. Handwritten-text recognition, though, was a piece of the stack I had never built end-to-end myself. I treated this dataset as a chance to fill that gap while staying inside the constraints I optimize for at work."><meta property="og:locale" content="en_us"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2026-06-18T00:00:00+00:00"><meta property="article:modified_time" content="2026-06-18T00:00:00+00:00"><meta property="article:tag" content="OCR"><meta property="article:tag" content="Handwriting"><meta property="article:tag" content="Computer-Vision"><meta property="article:tag" content="Deep-Learning"><link rel=canonical href=https://trolmark.github.io/posts/handwritten_ocr/><link rel=preload href=/fonts/fa-brands-400.woff2 as=font type=font/woff2 crossorigin><link rel=preload href=/fonts/fa-regular-400.woff2 as=font type=font/woff2 crossorigin><link rel=preload href=/fonts/fa-solid-900.woff2 as=font type=font/woff2 crossorigin><link rel=stylesheet href=/css/coder.min.f6b1b35a7b02521b25338f6cf58975f9980a6c12847763fe35a48307758cd1e7.css integrity="sha256-9rGzWnsCUhslM49s9Yl1+ZgKbBKEd2P+NaSDB3WM0ec=" crossorigin=anonymous media=screen><link rel=stylesheet href=/css/custom.min.751411ac3141e7b58c72f335a745a1e90bfbb8477d38e4e73dcae1b6016d0a59.css integrity="sha256-dRQRrDFB57WMcvM1p0Wh6Qv7uEd9OOTnPcrhtgFtClk=" crossorigin=anonymous media=screen><link rel=icon type=image/svg+xml href=/images/favicon.svg sizes=any><link rel=icon type=image/png href=/images/favicon-32x32.png sizes=32x32><link rel=icon type=image/png href=/images/favicon-16x16.png sizes=16x16><link rel=apple-touch-icon href=/images/apple-touch-icon.png><link rel=apple-touch-icon sizes=180x180 href=/images/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/images/safari-pinned-tab.svg color=#5bbad5></head><body class="preload-transitions colorscheme-light"><div class=float-container><a id=dark-mode-toggle class=colorscheme-toggle><i class="fa-solid fa-adjust fa-fw" aria-hidden=true></i></a></div><main class=wrapper><nav class=navigation><section class=container><a class=navigation-title href=https://trolmark.github.io/>Andrii's Notes
+</a><input type=checkbox id=menu-toggle>
+<label class="menu-button float-right" for=menu-toggle><i class="fa-solid fa-bars fa-fw" aria-hidden=true></i></label><ul class=navigation-list><li class=navigation-item><a class=navigation-link href=/posts/>Posts</a></li><li class=navigation-item><a class=navigation-link href=/tags/>Tags</a></li><li class=navigation-item><a class=navigation-link href=/about/>About</a></li></ul></section></nav><div class=content><section class="container post"><article><header><div class=post-title><h1 class=title><a class=title-link href=https://trolmark.github.io/posts/handwritten_ocr/>Building a Compact Handwritten OCR Pipeline</a></h1></div><div class=post-meta><div class=date><span class=posted-on><i class="fa-solid fa-calendar" aria-hidden=true></i>
+<time datetime=2026-06-18T00:00:00Z>June 2026
+</time></span><span class=reading-time><i class="fa-solid fa-clock" aria-hidden=true></i>
+28-minute read</span></div><div class=categories><i class="fa-solid fa-folder" aria-hidden=true></i>
+<a href=/categories/engineering/>Engineering</a></div><div class=tags><i class="fa-solid fa-tag" aria-hidden=true></i>
+<span class=tag><a href=/tags/ocr/>OCR</a>
+</span><span class=separator>•</span>
+<span class=tag><a href=/tags/handwriting/>Handwriting</a>
+</span><span class=separator>•</span>
+<span class=tag><a href=/tags/computer-vision/>Computer-Vision</a>
+</span><span class=separator>•</span>
+<span class=tag><a href=/tags/deep-learning/>Deep-Learning</a></span></div></div></header><div class=post-content><h2 id=introduction>Introduction
+<a class=heading-link href=#introduction><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><p>A while back, the <a href=https://www.kaggle.com/competitions/handwritten-to-data title="Handwritten to Data" class=external-link target=_blank rel=noopener>Handwritten to Data</a> Kaggle
 competition focused on Ukrainian handwriting recognition. The dataset is
-publicly available on Hugging Face as <code>UkrainianCatholicUniversity/rukopys</code>.</p>
-<p>Part of my day job is on the deployment side of ML — <strong>porting and
+publicly available on Hugging Face as <code>UkrainianCatholicUniversity/rukopys</code>.</p><p>Part of my day job is on the deployment side of ML — <strong>porting and
 optimizing models to run on mobile phones</strong>, where the recurring
 questions are &ldquo;does this fit in memory?&rdquo;, &ldquo;does it hit the latency budget?&rdquo;,
 and &ldquo;does it run on the target hardware?&rdquo;. Within that, I work mostly
@@ -233,13 +43,11 @@ on document AI: page detection, document classification, image
 enhancement. Handwritten-text recognition, though, was a piece of the
 stack I had never built end-to-end myself. I treated this dataset as a
 chance to fill that gap while staying inside the constraints I optimize
-for at work.</p>
-<p>I also wanted to keep the project compact for a learning reason: small
+for at work.</p><p>I also wanted to keep the project compact for a learning reason: small
 enough to retrain on a single machine, simple enough to iterate on
 quickly, and easy enough to debug that each new idea could be
 understood before the next one landed on top. Fine-tuning a heavyweight
-checkpoint would have hidden exactly the parts I wanted to learn.</p>
-<p>The compact framing also matches a real production reality. Modern VLMs
+checkpoint would have hidden exactly the parts I wanted to learn.</p><p>The compact framing also matches a real production reality. Modern VLMs
 read handwriting impressively well, and when a high-end GPU is
 available at inference time, calling one is often the right move. But
 many deployment targets do not look like that. The serving box may be a
@@ -248,938 +56,307 @@ requirement, latency budgets may rule out multi-billion-parameter
 models per request, or a fast first-pass transcription may be refined
 by a heavier model downstream. For those settings, a compact classical
 pipeline is still the right starting point — <strong>not as a replacement for
-VLMs, but as the layer underneath or in front of them</strong>.</p>
-<p>The end result is a <strong>~36 MB (fp16) CPU-runnable pipeline that scores
+VLMs, but as the layer underneath or in front of them</strong>.</p><p>The end result is a <strong>~36 MB (fp16) CPU-runnable pipeline that scores
 0.811</strong> on the competition metric — small enough to fit on a phone,
 transparent enough that errors can be traced to a specific stage,
 trainable by one person on one machine, and accurate enough to be
-useful as a first-pass transcription before any VLM refinement.</p>
-<p>This article follows that path through the whole system: line
+useful as a first-pass transcription before any VLM refinement.</p><p>This article follows that path through the whole system: line
 detection, recognition, decoding, language-model rescoring, and the
 post-processing attempts that did not work. The interesting part is not
 a single model checkpoint, but <strong>the way each stage changes the error
-profile of the next one</strong>.</p>
-<p>The dataset contains full-page handwritten documents and extracted
+profile of the next one</strong>.</p><p>The dataset contains full-page handwritten documents and extracted
 recognition crops with different levels of difficulty: clean lines,
 dense pages, noisy regions, and ambiguous crops. A few examples are
 enough to show why this is a pipeline problem rather than only a
-recognizer problem.</p>
-<div class="page-image-grid page-image-grid-4">
-  <figure>
-    <img src="/images/handwritten-ocr/dataset-example-1.jpg" alt="Old handwritten letter example">
-    <figcaption>Old letters.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/dataset-example-2.jpg" alt="School notes handwriting example">
-    <figcaption>School notes.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/dataset-example-3.jpg" alt="Metric book handwritten record example">
-    <figcaption>Metric books.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/dataset-example-4.jpg" alt="Government document handwriting example">
-    <figcaption>Government documents.</figcaption>
-  </figure>
-</div>
-<h3 id="evaluation-metric">
-  Evaluation Metric
-  <a class="heading-link" href="#evaluation-metric">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>The competition score was defined as:</p>
-<p>$$
+recognizer problem.</p><div class="page-image-grid page-image-grid-4"><figure><img src=/images/handwritten-ocr/dataset-example-1.jpg alt="Old handwritten letter example"><figcaption>Old letters.</figcaption></figure><figure><img src=/images/handwritten-ocr/dataset-example-2.jpg alt="School notes handwriting example"><figcaption>School notes.</figcaption></figure><figure><img src=/images/handwritten-ocr/dataset-example-3.jpg alt="Metric book handwritten record example"><figcaption>Metric books.</figcaption></figure><figure><img src=/images/handwritten-ocr/dataset-example-4.jpg alt="Government document handwriting example"><figcaption>Government documents.</figcaption></figure></div><h3 id=evaluation-metric>Evaluation Metric
+<a class=heading-link href=#evaluation-metric><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>The competition score was defined as:</p><p>$$
 \begin{aligned}
-\text{Score} ={} &amp; 0.15 \times \text{Detection F1} \
-&amp; + 0.05 \times \text{ClassAcc} \
-&amp; + 0.30 \times (1 - \text{CER}) \
-&amp; + 0.50 \times (1 - \text{PageCER})
+\text{Score} ={} & 0.15 \times \text{Detection F1} \
+& + 0.05 \times \text{ClassAcc} \
+& + 0.30 \times (1 - \text{CER}) \
+& + 0.50 \times (1 - \text{PageCER})
 \end{aligned}
-$$</p>
-<p>The score is a weighted combination of detection, classification, and text
-recognition quality:</p>
-<ul>
-<li><strong>Detection F1 (15%)</strong> measures type-agnostic bounding-box detection. A
+$$</p><p>The score is a weighted combination of detection, classification, and text
+recognition quality:</p><ul><li><strong>Detection F1 (15%)</strong> measures type-agnostic bounding-box detection. A
 predicted box counts as a true positive when its IoU with a ground-truth box
-is at least <code>0.5</code>.</li>
-<li><strong>Classification Accuracy (5%)</strong> is computed on IoU-matched region pairs and
+is at least <code>0.5</code>.</li><li><strong>Classification Accuracy (5%)</strong> is computed on IoU-matched region pairs and
 checks whether the predicted region type matches the ground-truth type.
 Region types include handwritten, printed, formula, table, annotation, image,
-and graph.</li>
-<li><strong>Character Error Rate (30%)</strong> is computed per region and averaged over
+and graph.</li><li><strong>Character Error Rate (30%)</strong> is computed per region and averaged over
 scorable regions. A region is scorable when the ground truth has
-<code>language=uk</code>, <code>legibility=legible</code>, and the type is not <code>image</code> or <code>graph</code>.</li>
-<li><strong>Page CER (50%)</strong> compares full-page text. Ground-truth and predicted
+<code>language=uk</code>, <code>legibility=legible</code>, and the type is not <code>image</code> or <code>graph</code>.</li><li><strong>Page CER (50%)</strong> compares full-page text. Ground-truth and predicted
 regions are sorted by reading order, concatenated into strings, and compared
 with Levenshtein distance. This component is agnostic to box granularity and
-rewards correct page text even when individual boundaries are not perfect.</li>
-</ul>
-<h2 id="1-line-detection">
-  1. Line Detection
-  <a class="heading-link" href="#1-line-detection">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<h3 id="framing-the-detection-task">
-  Framing the Detection Task
-  <a class="heading-link" href="#framing-the-detection-task">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>The first step was to look at the available annotations and decide how to
+rewards correct page text even when individual boundaries are not perfect.</li></ul><h2 id=1-line-detection>1. Line Detection
+<a class=heading-link href=#1-line-detection><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><h3 id=framing-the-detection-task>Framing the Detection Task
+<a class=heading-link href=#framing-the-detection-task><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>The first step was to look at the available annotations and decide how to
 formulate the detection problem. Since the dataset already provided text-line
-bounding boxes, the most obvious starting point was a YOLO-style detector.</p>
-<p>This approach has several practical advantages:</p>
-<ul>
-<li>simple annotation format;</li>
-<li>mature training and evaluation pipelines;</li>
-<li>fast inference;</li>
-<li>rather small models.</li>
-</ul>
-<p>However, handwritten text lines are not natural rectangular objects. They are
+bounding boxes, the most obvious starting point was a YOLO-style detector.</p><p>This approach has several practical advantages:</p><ul><li>simple annotation format;</li><li>mature training and evaluation pipelines;</li><li>fast inference;</li><li>rather small models.</li></ul><p>However, handwritten text lines are not natural rectangular objects. They are
 long, thin structures that may be curved, densely packed, and separated by only
 a few pixels. Representing them with bounding boxes introduces several
-challenges:</p>
-<ul>
-<li>Dense pages produce many overlapping boxes, making non-maximum suppression an important part of the detection pipeline.</li>
-<li>Curved or slanted lines are only approximated by rectangular regions.</li>
-<li>Neighboring lines can touch or overlap vertically, making box boundaries ambiguous.</li>
-<li>A correctly localized box does not necessarily produce a good recognition crop.</li>
-<li>Bounding boxes describe where a line is located, but provide little information about how adjacent lines should be separated.</li>
-</ul>
-<div class="wide-image-grid">
-  <figure>
-    <img src="/images/handwritten-ocr/detection-problem-overlapping-boxes.jpg" alt="Dense page with many overlapping line boxes">
-    <figcaption>Dense pages create overlapping boxes and make non-maximum suppression part of the core pipeline.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/detection-problem-curved-lines.jpg" alt="Curved or slanted handwriting poorly represented by rectangles">
-    <figcaption>Curved or slanted lines are only approximated by rectangles.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/detection-problem-bad-recognition-crop.jpg" alt="Box that localizes a line but produces a bad recognition crop">
-    <figcaption>A localized box can still produce a bad recognition crop.</figcaption>
-  </figure>
-</div>
-<p>These observations suggested that the task might be better formulated as a
+challenges:</p><ul><li>Dense pages produce many overlapping boxes, making non-maximum suppression an important part of the detection pipeline.</li><li>Curved or slanted lines are only approximated by rectangular regions.</li><li>Neighboring lines can touch or overlap vertically, making box boundaries ambiguous.</li><li>A correctly localized box does not necessarily produce a good recognition crop.</li><li>Bounding boxes describe where a line is located, but provide little information about how adjacent lines should be separated.</li></ul><div class=wide-image-grid><figure><img src=/images/handwritten-ocr/detection-problem-overlapping-boxes.jpg alt="Dense page with many overlapping line boxes"><figcaption>Dense pages create overlapping boxes and make non-maximum suppression part of the core pipeline.</figcaption></figure><figure><img src=/images/handwritten-ocr/detection-problem-curved-lines.jpg alt="Curved or slanted handwriting poorly represented by rectangles"><figcaption>Curved or slanted lines are only approximated by rectangles.</figcaption></figure><figure><img src=/images/handwritten-ocr/detection-problem-bad-recognition-crop.jpg alt="Box that localizes a line but produces a bad recognition crop"><figcaption>A localized box can still produce a bad recognition crop.</figcaption></figure></div><p>These observations suggested that the task might be better formulated as a
 segmentation problem rather than a pure object-detection problem. Instead of
 predicting a rectangle around each line, the model could predict the geometric
 structure of the page and leave the final line extraction to a dedicated
-postprocessing stage.</p>
-<h3 id="arunet">
-  ARUNet
-  <a class="heading-link" href="#arunet">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>For line detection I used an ARUNet-style segmentation model from <a href="https://arxiv.org/abs/1802.03345" title="A Two-Stage Method for Text Line Detection in Historical Documents"  class="external-link" target="_blank" rel="noopener">A Two-Stage Method for Text Line Detection in Historical Documents</a>. Instead of predicting boxes, it produces dense centerline and separator maps, which handle curved text, touching lines, and variable spacing more explicitly. Conceptually, it is a U-Net encoder-decoder network with attention blocks added to improve spatial focus. The encoder extracts increasingly abstract page features, while the decoder upsamples them back to pixel-level prediction maps.</p>
-<p>The important part is that the model remains fully convolutional: it predicts dense maps over the whole page instead of proposing individual boxes. Spatial attention helps the decoder focus on relevant text-line structures while suppressing background texture, page noise, and unrelated strokes.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/arunet-architecture.jpg" alt="ARUNet architecture diagram with U-Net encoder decoder and spatial attention">
-  <figcaption>ARUNet architecture reproduced from <a href="https://arxiv.org/abs/1802.03345">A Two-Stage Method for Text Line Detection in Historical Documents</a>.</figcaption>
-</figure>
-<p>The training targets are not rectangular boxes. They are dense supervision maps: one map describes likely text centerlines, and another describes separator regions.
-Given the original bbox annotations, I rasterize the supervision maps from the box geometry itself: the box centerline defines the positive centerline trace, and the box height determines how much vertical support belongs to the line versus the separator bands around it.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/training-target-original.jpg" alt="Original handwritten crop used to build supervision targets">
-  <figcaption>Original image.</figcaption>
-</figure>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/training-targets-baseline-separator.jpg" alt="Baseline and separator supervision targets derived from bounding boxes">
-  <figcaption>Pixel predictions: green encodes the separator class, red the baseline class, and black the "other" class.</figcaption>
-</figure>
-<p>The line-probability map replaces rectangular proposals with a soft centerline
+postprocessing stage.</p><h3 id=arunet>ARUNet
+<a class=heading-link href=#arunet><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>For line detection I used an ARUNet-style segmentation model from <a href=https://arxiv.org/abs/1802.03345 title="A Two-Stage Method for Text Line Detection in Historical Documents" class=external-link target=_blank rel=noopener>A Two-Stage Method for Text Line Detection in Historical Documents</a>. Instead of predicting boxes, it produces dense centerline and separator maps, which handle curved text, touching lines, and variable spacing more explicitly. Conceptually, it is a U-Net encoder-decoder network with attention blocks added to improve spatial focus. The encoder extracts increasingly abstract page features, while the decoder upsamples them back to pixel-level prediction maps.</p><p>The important part is that the model remains fully convolutional: it predicts dense maps over the whole page instead of proposing individual boxes. Spatial attention helps the decoder focus on relevant text-line structures while suppressing background texture, page noise, and unrelated strokes.</p><figure class=wide-figure><img src=/images/handwritten-ocr/arunet-architecture.jpg alt="ARUNet architecture diagram with U-Net encoder decoder and spatial attention"><figcaption>ARUNet architecture reproduced from <a href=https://arxiv.org/abs/1802.03345>A Two-Stage Method for Text Line Detection in Historical Documents</a>.</figcaption></figure><p>The training targets are not rectangular boxes. They are dense supervision maps: one map describes likely text centerlines, and another describes separator regions.
+Given the original bbox annotations, I rasterize the supervision maps from the box geometry itself: the box centerline defines the positive centerline trace, and the box height determines how much vertical support belongs to the line versus the separator bands around it.</p><figure class=wide-figure><img src=/images/handwritten-ocr/training-target-original.jpg alt="Original handwritten crop used to build supervision targets"><figcaption>Original image.</figcaption></figure><figure class=wide-figure><img src=/images/handwritten-ocr/training-targets-baseline-separator.jpg alt="Baseline and separator supervision targets derived from bounding boxes"><figcaption>Pixel predictions: green encodes the separator class, red the baseline class, and black the "other" class.</figcaption></figure><p>The line-probability map replaces rectangular proposals with a soft centerline
 signal, while the separator map gives postprocessing an explicit cue for
 splitting nearby text regions. This is the part that makes the method useful on
 dense pages where bounding boxes and connected components tend to become
-unstable.</p>
-<div class="page-image-grid">
-  <figure>
-    <img src="/images/handwritten-ocr/original-page.jpg" alt="Original handwritten page with dense cursive text">
-    <figcaption>Original page image.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/line-probability.png" alt="Line probability output with bright horizontal text centerlines">
-    <figcaption>Line-probability output.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/separator_probability.png" alt="Separator probability output with bright vertical separators">
-    <figcaption>Separator output.</figcaption>
-  </figure>
-</div>
-<h3 id="postprocessing-from-probability-maps-to-lines">
-  Postprocessing: From Probability Maps to Lines
-  <a class="heading-link" href="#postprocessing-from-probability-maps-to-lines">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>The network output is not a set of text lines. It is only a pair of probability maps.</p>
-<p>The centerline map answers: &ldquo;where is the middle of a text line likely to be?&rdquo;
+unstable.</p><div class=page-image-grid><figure><img src=/images/handwritten-ocr/original-page.jpg alt="Original handwritten page with dense cursive text"><figcaption>Original page image.</figcaption></figure><figure><img src=/images/handwritten-ocr/line-probability.png alt="Line probability output with bright horizontal text centerlines"><figcaption>Line-probability output.</figcaption></figure><figure><img src=/images/handwritten-ocr/separator_probability.png alt="Separator probability output with bright vertical separators"><figcaption>Separator output.</figcaption></figure></div><h3 id=postprocessing-from-probability-maps-to-lines>Postprocessing: From Probability Maps to Lines
+<a class=heading-link href=#postprocessing-from-probability-maps-to-lines><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>The network output is not a set of text lines. It is only a pair of probability maps.</p><p>The centerline map answers: &ldquo;where is the middle of a text line likely to be?&rdquo;
 The separator map answers: &ldquo;where should neighboring text regions be kept
-apart?&rdquo;</p>
-<p>Those maps are useful, but the recognizer needs something more concrete:
+apart?&rdquo;</p><p>Those maps are useful, but the recognizer needs something more concrete:
 ordered line crops. Each crop should contain one target line, preserve ascenders
-and descenders, and avoid leaking text from nearby lines.</p>
-<p>This is where postprocessing becomes a real part of the OCR system rather than a small cleanup step. I partially followed the logic from <a href="https://arxiv.org/abs/1802.03345" title="A Two-Stage Method for Text Line Detection in Historical Documents"  class="external-link" target="_blank" rel="noopener">A Two-Stage Method for Text Line Detection in Historical Documents</a>: use the neural network to produce soft geometric evidence, then use classical image-processing and graph logic to recover line instances.</p>
-<h4 id="sparse-line-points">
-  Sparse Line Points
-  <a class="heading-link" href="#sparse-line-points">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h4>
-<p>The first step is to reduce the dense centerline map to a sparse set of points.
+and descenders, and avoid leaking text from nearby lines.</p><p>This is where postprocessing becomes a real part of the OCR system rather than a small cleanup step. I partially followed the logic from <a href=https://arxiv.org/abs/1802.03345 title="A Two-Stage Method for Text Line Detection in Historical Documents" class=external-link target=_blank rel=noopener>A Two-Stage Method for Text Line Detection in Historical Documents</a>: use the neural network to produce soft geometric evidence, then use classical image-processing and graph logic to recover line instances.</p><h4 id=sparse-line-points>Sparse Line Points
+<a class=heading-link href=#sparse-line-points><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h4><p>The first step is to reduce the dense centerline map to a sparse set of points.
 The map is thresholded, skeletonized, and sampled into representative points on
 likely text centerlines. This keeps the postprocessor lightweight: instead of
-reasoning over every pixel, it reasons over a compact set of line points.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/v0-superpixels.jpg" alt="Sparse superpixels sampled from the baseline probability map">
-  <figcaption>Sparse points sampled from the centerline map.</figcaption>
-</figure>
-<h4 id="graph-linking">
-  Graph Linking
-  <a class="heading-link" href="#graph-linking">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h4>
-<p>The next step links nearby points that plausibly belong to the same text line.
+reasoning over every pixel, it reasons over a compact set of line points.</p><figure class=wide-figure><img src=/images/handwritten-ocr/v0-superpixels.jpg alt="Sparse superpixels sampled from the baseline probability map"><figcaption>Sparse points sampled from the centerline map.</figcaption></figure><h4 id=graph-linking>Graph Linking
+<a class=heading-link href=#graph-linking><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h4><p>The next step links nearby points that plausibly belong to the same text line.
 The links use local direction, spacing, and centerline confidence, while the
 separator map discourages connections across neighboring lines. In code, the
 candidate edge score is a weighted sum of forward distance, perpendicular
 offset, orientation mismatch, and a long-offset penalty, with hard filters on
 angle, gap size, and intervening candidates. The result is a sparse graph where
-edges mean: &ldquo;these points probably continue the same line.&rdquo;</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/v0-candidate-links.jpg" alt="Candidate links between nearby superpixels">
-  <figcaption>Candidate links between nearby line points.</figcaption>
-</figure>
-<h4 id="line-fragments-and-merging">
-  Line Fragments and Merging
-  <a class="heading-link" href="#line-fragments-and-merging">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h4>
-<p>Connected components of the graph become initial line fragments. These fragments
+edges mean: &ldquo;these points probably continue the same line.&rdquo;</p><figure class=wide-figure><img src=/images/handwritten-ocr/v0-candidate-links.jpg alt="Candidate links between nearby superpixels"><figcaption>Candidate links between nearby line points.</figcaption></figure><h4 id=line-fragments-and-merging>Line Fragments and Merging
+<a class=heading-link href=#line-fragments-and-merging><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h4><p>Connected components of the graph become initial line fragments. These fragments
 are intentionally conservative: faint ink, gaps in the centerline map, or
 ambiguous spacing can split one real text line into several pieces. A merge step
-then joins fragments when their geometry and centerline support are consistent.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/v0-clusters.jpg" alt="Connected-component clusters representing line fragments">
-  <figcaption>Line fragments grouped from the linked sparse points.</figcaption>
-</figure>
-<h4 id="recognition-boxes">
-  Recognition Boxes
-  <a class="heading-link" href="#recognition-boxes">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h4>
-<p>The final recognizer cannot read a one-pixel centerline. It needs an image crop
+then joins fragments when their geometry and centerline support are consistent.</p><figure class=wide-figure><img src=/images/handwritten-ocr/v0-clusters.jpg alt="Connected-component clusters representing line fragments"><figcaption>Line fragments grouped from the linked sparse points.</figcaption></figure><h4 id=recognition-boxes>Recognition Boxes
+<a class=heading-link href=#recognition-boxes><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h4><p>The final recognizer cannot read a one-pixel centerline. It needs an image crop
 containing the full handwriting around that line. The last step therefore
 converts merged line fragments into recognition boxes, then expands them enough
-to keep ascenders, descenders, and small baseline errors inside the crop.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/v0-oriented-bboxes.jpg" alt="Oriented line boxes produced from connected-component baseline clusters">
-  <figcaption>Recognition boxes produced from grouped line fragments.</figcaption>
-</figure>
-<p>This last step is where detection becomes directly tied to recognition quality. A crop that is too tight loses strokes. A crop that is too large introduces text from adjacent lines. The postprocessor has to find a practical middle point, and doing it explicitly makes failures inspectable.</p>
-<p>The result of this postprocessing is a list of ordered recognition crops. This
+to keep ascenders, descenders, and small baseline errors inside the crop.</p><figure class=wide-figure><img src=/images/handwritten-ocr/v0-oriented-bboxes.jpg alt="Oriented line boxes produced from connected-component baseline clusters"><figcaption>Recognition boxes produced from grouped line fragments.</figcaption></figure><p>This last step is where detection becomes directly tied to recognition quality. A crop that is too tight loses strokes. A crop that is too large introduces text from adjacent lines. The postprocessor has to find a practical middle point, and doing it explicitly makes failures inspectable.</p><p>The result of this postprocessing is a list of ordered recognition crops. This
 style was useful because it kept the neural network output simple while making
 the conversion from dense maps to line crops inspectable. It also made failures
 easy to categorize: missing centerline evidence, wrong links, broken fragments,
-or boxes that include too much neighboring text.</p>
-<p>What graph-based postprocessing gives you in practice:</p>
-<ul>
-<li>explicit, inspectable control over how nearby lines are split, via the
-separator map;</li>
-<li>line recovery from sparse evidence — broken or faint centerlines can still
-be linked into a coherent line;</li>
-<li>intermediate stages (sparse points → links → fragments → boxes) that can
-be visualized and inspected separately;</li>
-<li>recognition crops that can be evaluated independently of the recognizer.</li>
-</ul>
-<hr>
-<h2 id="2-recognition">
-  2. Recognition
-  <a class="heading-link" href="#2-recognition">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<h3 id="baseline-crnn--ctc">
-  Baseline: CRNN + CTC
-  <a class="heading-link" href="#baseline-crnn--ctc">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>After the detector started producing usable line crops, the next question was recognition. For the first baseline I wanted something deliberately simple: a model that is easy to train, easy to debug, and fast enough to run locally.</p>
-<p>I used the setup described in <a href="https://arxiv.org/abs/2404.11339" title="Best Practices for a Handwritten Text Recognition System"  class="external-link" target="_blank" rel="noopener">Best Practices for a Handwritten Text Recognition System</a> as the starting point: a CRNN-style recognizer trained with <a href="https://distill.pub/2017/ctc/" title="Sequence Modeling With CTC"  class="external-link" target="_blank" rel="noopener">Connectionist Temporal Classification</a>. The point was not to build the strongest possible recognizer immediately, but to create a stable baseline that could tell whether the line detector was good enough.</p>
-<p>The baseline recognizer has three main parts:</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/crnn-ctc-baseline-architecture.jpg" alt="CRNN CTC baseline architecture with an auxiliary CTC shortcut head and a region-type head">
-  <figcaption>Baseline CRNN+CTC recognizer: a spatial transformer first normalizes the crop geometry, then a CNN encoder extracts visual features, auxiliary heads predict crop-level signals, and the sequence decoder produces CTC character logits.</figcaption>
-</figure>
-<p>The recognizer includes a small <strong>spatial transformer block</strong> from the start.
+or boxes that include too much neighboring text.</p><p>What graph-based postprocessing gives you in practice:</p><ul><li>explicit, inspectable control over how nearby lines are split, via the
+separator map;</li><li>line recovery from sparse evidence — broken or faint centerlines can still
+be linked into a coherent line;</li><li>intermediate stages (sparse points → links → fragments → boxes) that can
+be visualized and inspected separately;</li><li>recognition crops that can be evaluated independently of the recognizer.</li></ul><hr><h2 id=2-recognition>2. Recognition
+<a class=heading-link href=#2-recognition><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><h3 id=baseline-crnn--ctc>Baseline: CRNN + CTC
+<a class=heading-link href=#baseline-crnn--ctc><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>After the detector started producing usable line crops, the next question was recognition. For the first baseline I wanted something deliberately simple: a model that is easy to train, easy to debug, and fast enough to run locally.</p><p>I used the setup described in <a href=https://arxiv.org/abs/2404.11339 title="Best Practices for a Handwritten Text Recognition System" class=external-link target=_blank rel=noopener>Best Practices for a Handwritten Text Recognition System</a> as the starting point: a CRNN-style recognizer trained with <a href=https://distill.pub/2017/ctc/ title="Sequence Modeling With CTC" class=external-link target=_blank rel=noopener>Connectionist Temporal Classification</a>. The point was not to build the strongest possible recognizer immediately, but to create a stable baseline that could tell whether the line detector was good enough.</p><p>The baseline recognizer has three main parts:</p><figure class=wide-figure><img src=/images/handwritten-ocr/crnn-ctc-baseline-architecture.jpg alt="CRNN CTC baseline architecture with an auxiliary CTC shortcut head and a region-type head"><figcaption>Baseline CRNN+CTC recognizer: a spatial transformer first normalizes the crop geometry, then a CNN encoder extracts visual features, auxiliary heads predict crop-level signals, and the sequence decoder produces CTC character logits.</figcaption></figure><p>The recognizer includes a small <strong>spatial transformer block</strong> from the start.
 It learns a lightweight affine correction before feature extraction, which
 helps normalize slanted or slightly shifted line crops without a manual
-perspective step.</p>
-<p>The <strong>CNN</strong> extracts visual features from the normalized line crop. The feature
+perspective step.</p><p>The <strong>CNN</strong> extracts visual features from the normalized line crop. The feature
 map is converted into a left-to-right sequence, the <strong>BiLSTM</strong> models context
 along the line, and a small time-axis <strong>self-attention block</strong> with 4 heads can
 refine the sequence before the final <strong>CTC classifier</strong> predicts character
-probabilities for each time step.</p>
-<p>CTC is a natural fit here because the training data gives the final text string, not character-level positions. The model is allowed to learn the alignment between image columns and output characters by itself:</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/ctc-loss-alignment.jpg" alt="CTC loss alignment between image timesteps and output characters">
-  <figcaption>CTC learns a monotonic alignment between visual timesteps and the target text, then collapses blanks and repeated symbols into the final transcription.</figcaption>
-</figure>
-<p>This makes the recognizer much easier to train than a fully supervised character-segmentation model.</p>
-<p>The preprocessing step matters as much as the model:</p>
-<ul>
-<li>Recognition crops are resized to <code>128 x 1024</code> (<code>height x width</code>). Smaller crops keep their aspect ratio and are padded, while larger crops are resized to fit.</li>
-<li>During training, I apply on-the-fly geometric distortions and intensity perturbations as light handwritten-text augmentation.</li>
-<li>To match the padding around the image, the target text is extended with a boundary space token before and after the actual transcription. This avoids forcing the first and last characters to align directly with the crop boundaries.</li>
-</ul>
-<p>I added two small auxiliary branches around this baseline:</p>
-<ul>
-<li><strong>Auxiliary CTC shortcut head.</strong> A convolution-only branch trained with its
+probabilities for each time step.</p><p>CTC is a natural fit here because the training data gives the final text string, not character-level positions. The model is allowed to learn the alignment between image columns and output characters by itself:</p><figure class=wide-figure><img src=/images/handwritten-ocr/ctc-loss-alignment.jpg alt="CTC loss alignment between image timesteps and output characters"><figcaption>CTC learns a monotonic alignment between visual timesteps and the target text, then collapses blanks and repeated symbols into the final transcription.</figcaption></figure><p>This makes the recognizer much easier to train than a fully supervised character-segmentation model.</p><p>The preprocessing step matters as much as the model:</p><ul><li>Recognition crops are resized to <code>128 x 1024</code> (<code>height x width</code>). Smaller crops keep their aspect ratio and are padded, while larger crops are resized to fit.</li><li>During training, I apply on-the-fly geometric distortions and intensity perturbations as light handwritten-text augmentation.</li><li>To match the padding around the image, the target text is extended with a boundary space token before and after the actual transcription. This avoids forcing the first and last characters to align directly with the crop boundaries.</li></ul><p>I added two small auxiliary branches around this baseline:</p><ul><li><strong>Auxiliary CTC shortcut head.</strong> A convolution-only branch trained with its
 own CTC loss. It projects directly to the character vocabulary and helps
 optimization by giving the encoder a shorter gradient path, in the same
-spirit as a residual shortcut.</li>
-<li><strong>Region-type head.</strong> A classifier for handwritten text, printed text,
+spirit as a residual shortcut.</li><li><strong>Region-type head.</strong> A classifier for handwritten text, printed text,
 formula, annotation, and other region classes used in the dataset. It does not
 transcribe text directly, but it gives a useful diagnostic signal when one
-content type fails much more often than others.</li>
-</ul>
-<p>This was a good first recognizer because it was stable, fast, and easy to debug.
+content type fails much more often than others.</li></ul><p>This was a good first recognizer because it was stable, fast, and easy to debug.
 If it failed on clean crops, the recognition model was likely the problem. If it
 worked on clean crops but failed in the full pipeline, the detector or crop
-postprocessing was more likely responsible.</p>
-<h4 id="problem-printed-text-recognition-failures">
-  Problem: Printed Text Recognition Failures
-  <a class="heading-link" href="#problem-printed-text-recognition-failures">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h4>
-<p>The first serious debugging loop started with printed text. Based on visual inspection, these lines looked easier than handwriting: the glyphs were clean, the spacing was regular, and the crops were usually readable. But the validation metrics showed many errors for printed regions.</p>
-<p>At first this looked suspicious. If the model fails on messy handwriting, there are many possible explanations: bad crops, ambiguous letters, inconsistent labels, or weak language modeling. But when it fails on clean printed text and produces complete nonsense, the problem is often more structural.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/ctc-too-few-steps.jpg" alt="A visually clear printed crop where the model produces ambiguous text">
-  <figcaption>A visually clear printed crop where the model produces ambiguous text.</figcaption>
-</figure>
-<p>After more inspection, the problem turned out to be structural.
+postprocessing was more likely responsible.</p><h4 id=problem-printed-text-recognition-failures>Problem: Printed Text Recognition Failures
+<a class=heading-link href=#problem-printed-text-recognition-failures><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h4><p>The first serious debugging loop started with printed text. Based on visual inspection, these lines looked easier than handwriting: the glyphs were clean, the spacing was regular, and the crops were usually readable. But the validation metrics showed many errors for printed regions.</p><p>At first this looked suspicious. If the model fails on messy handwriting, there are many possible explanations: bad crops, ambiguous letters, inconsistent labels, or weak language modeling. But when it fails on clean printed text and produces complete nonsense, the problem is often more structural.</p><figure class=wide-figure><img src=/images/handwritten-ocr/ctc-too-few-steps.jpg alt="A visually clear printed crop where the model produces ambiguous text"><figcaption>A visually clear printed crop where the model produces ambiguous text.</figcaption></figure><p>After more inspection, the problem turned out to be structural.
 Before CTC classification, the CNN encoder converts the crop into a left-to-right
 feature sequence. Its convolution and pooling layers reduce the horizontal
 dimension to make recognition cheaper. In the original encoder, the cumulative
 horizontal reduction was about <code>16x</code>: a crop with useful width <code>W</code> produced only
 about <code>W / 16</code> CTC timesteps. A compact printed line can therefore be visually
-clear but still leave the CTC head with too few positions for its characters.</p>
-<p>CTC needs enough input steps to align the output string. It is not enough that the image is readable to a human. The model needs a time dimension long enough to place characters, repeated characters, and blanks.</p>
-<p>Printed text is denser than handwriting, so the same crop width can contain many
-more characters. I measured this with a simple ratio:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ctc_ratio = sequence_length / label_length
+clear but still leave the CTC head with too few positions for its characters.</p><p>CTC needs enough input steps to align the output string. It is not enough that the image is readable to a human. The model needs a time dimension long enough to place characters, repeated characters, and blanks.</p><p>Printed text is denser than handwriting, so the same crop width can contain many
+more characters. I measured this with a simple ratio:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>ctc_ratio = sequence_length / label_length
 </span></span></code></pre></div><p>Low-ratio samples were the failures to inspect first. If the sequence is shorter
 than the label, alignment is impossible; even slightly above that threshold, CTC
-has little room for blanks and repeated characters.</p>
-<p>The <code>W</code> in this calculation is the crop width after aspect-preserving resize,
+has little room for blanks and repeated characters.</p><p>The <code>W</code> in this calculation is the crop width after aspect-preserving resize,
 not the full padded <code>1024</code>-pixel canvas. Padding fills the remaining canvas but
 does not create useful visual timesteps. The target length also includes one
 boundary space before and after the transcription, so the plotted label length
 is the visible text plus two CTC tokens. With <code>16x</code> horizontal downsampling,
 every point below the diagonal has fewer usable timesteps than target characters
-and therefore cannot be aligned by CTC.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/ctc-sequence-vs-label-length.png" alt="Scatter plot of CTC sequence length versus target label length for printed recognition crops">
-  <figcaption>Printed train and silver crops under the original 16x downsampling. Red points fall below the diagonal, where CTC has fewer timesteps than target characters.</figcaption>
-</figure>
-<p>Sorting by this ratio matched the manual failures: clear printed crops with long
+and therefore cannot be aligned by CTC.</p><figure class=wide-figure><img src=/images/handwritten-ocr/ctc-sequence-vs-label-length.png alt="Scatter plot of CTC sequence length versus target label length for printed recognition crops"><figcaption>Printed train and silver crops under the original 16x downsampling. Red points fall below the diagonal, where CTC has fewer timesteps than target characters.</figcaption></figure><p>Sorting by this ratio matched the manual failures: clear printed crops with long
 labels and too few CTC timesteps. The fix was to change the first convolution&rsquo;s
 horizontal stride from <code>2</code> to <code>1</code>. This reduced the encoder&rsquo;s cumulative
 horizontal downsampling from <code>16x</code> to <code>8x</code>, doubling the number of CTC
-positions available for the same crop without changing the recognizer interface.</p>
-<h3 id="dataset-cleaning">
-  Dataset Cleaning
-  <a class="heading-link" href="#dataset-cleaning">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>The next issue was not architectural. It was data quality.</p>
-<p>For OCR datasets, it is easy to assume that the labels are correct because they came from an annotation pipeline. In practice, this assumption is dangerous. A recognizer trained on noisy labels can look like a weak model even when the architecture is fine.</p>
-<p>I treated this as an active-learning cleanup problem:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">Train baseline recognizer
-</span></span><span class="line"><span class="ln">2</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln">3</span><span class="cl">Evaluate training samples
-</span></span><span class="line"><span class="ln">4</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln">5</span><span class="cl">Find suspicious samples by metrics
-</span></span><span class="line"><span class="ln">6</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln">7</span><span class="cl">Inspect and clean labels/crops
-</span></span><span class="line"><span class="ln">8</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln">9</span><span class="cl">Retrain recognizer
-</span></span></code></pre></div><p>The idea is simple: once the model is good enough, its largest training-set errors are often not &ldquo;hard examples&rdquo; anymore. Many of them are annotation problems, broken crops, or samples whose image does not match the target text.</p>
-<p>For the check step, I used several metrics:</p>
-<ul>
-<li><strong>CER</strong>: normalized character error rate between prediction and label.</li>
-<li><strong>Prediction confidence</strong>: low-confidence predictions are useful candidates for inspection.</li>
-<li><strong>Region-type classifier confidence</strong>: high-confidence disagreement between expected and predicted type can reveal mislabeled regions.</li>
-</ul>
-<p>The main filters were:</p>
-<ul>
-<li>high <code>CER</code>;</li>
-<li>high classifier confidence for a different region type;</li>
-<li>low recognizer confidence combined with a large text mismatch.</li>
-</ul>
-<p>After sorting candidates by those signals and opening the images manually, several problems became obvious.</p>
-<p>Some crops contained more than one text line. In those cases the model had no principled way to know which line the label referred to. The image might contain two readable lines, while the target contains only one of them:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">crop image:  line A + line B
-</span></span><span class="line"><span class="ln">2</span><span class="cl">target:      line A
-</span></span><span class="line"><span class="ln">3</span><span class="cl">model:       line B, or a mixture of both
-</span></span></code></pre></div><p>Those samples are especially harmful because the visual input and label are both valid text, but they do not describe the same recognition task.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/label-noise-multiline.jpg" alt="Recognition crop containing multiple text lines">
-  <figcaption>A crop containing multiple lines while the label describes only one of them.</figcaption>
-</figure>
-<p>This is particularly bad for CTC training: if the crop contains two lines, there is no single left-to-right target sequence, so the network can align the wrong line and learn noisy supervision. Removing these multiline samples made the training objective more consistent.</p>
-<p>Other crops were simply messy: partial words, broken extraction, wrong region boundaries, or fragments where even a human would need surrounding context. Keeping those samples in training teaches the model inconsistent alignments.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/label-noise-bad-crop.jpg" alt="Messy recognition crop with poor alignment or broken text">
-  <figcaption>Expected text from label: "ти заяву про вихід з-під влади того уряду, то нащо тоді дава-", actually displayed: "ти заяву про".</figcaption>
-</figure>
-<p>I also used the classifier head to find region-type mismatches. For example, if a crop is labeled as handwritten but the classifier is highly confident that it is printed or formula-like, that sample becomes a review candidate.</p>
-<p>The important part is that removal was not fully automatic. Metrics were used to rank suspicious samples, then the final decision was made by visual inspection. Multiline crops, broken crops, and clear wrong-label examples were moved out of the training set. After cleanup, the recognizer was trained again on the refined dataset.</p>
-<p>Result after cleanup:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ARUNet + CRNN + greedy CTC: 0.746
-</span></span></code></pre></div><h2 id="3-detection-improvements">
-  3. Detection Improvements
-  <a class="heading-link" href="#3-detection-improvements">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<h3 id="detection-was-still-the-bottleneck">
-  Detection Was Still the Bottleneck
-  <a class="heading-link" href="#detection-was-still-the-bottleneck">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>After the first end-to-end version, the result was useful but the error analysis pointed back to detection. The recognition model was already sensitive to crop quality: if a crop contained extra text from a neighboring line, or if the target line was cut too tightly, the recognizer could fail even when the text itself was readable.</p>
-<p>Many pages were easy. When the lines were straight, well separated, and close to horizontal, the graph-based postprocessor produced good crops. These are the cases where the recognizer receives a clean line image and can do its job.</p>
-<div class="page-image-grid page-image-grid-2">
-  <figure>
-    <img src="/images/handwritten-ocr/detection-success-straight-lines_1.jpg" alt="Successful line detection example on straight well separated handwriting">
-    <figcaption>Straight, well-separated lines.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/detection-success-straight-lines_2.jpg" alt="Good recognition crop produced by clean line detection">
-    <figcaption>Clean crop suitable for recognition.</figcaption>
-  </figure>
-</div>
-<p>But the dataset also contained harder layouts:</p>
-<ul>
-<li>pages with separated blocks of text;</li>
-<li>curved baselines;</li>
-<li>text written under a noticeable angle;</li>
-<li>dense regions where neighboring lines were close;</li>
-<li>crops where a small amount of extra text changed the recognizer output.</li>
-</ul>
-<p>The difficult cases were not always dramatic. Sometimes the oriented box looked reasonable, but the crop still included part of the line above or below. For CTC recognition, this is enough to break the assumption that one crop corresponds to one target sequence.</p>
-<div class="page-image-grid">
-  <figure>
-    <img src="/images/handwritten-ocr/detection-failure-blocks.jpg" alt="Detection failure example with separated text blocks or difficult line layout">
-    <figcaption>Separated blocks and non-uniform line geometry.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/detection-failure-curved-angle.jpg" alt="Detection failure example with curved or angled handwriting">
-    <figcaption>Curved or angled handwriting.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/detection-failure-extra-text.jpg" alt="Detection failure example where crop contains extra neighboring text">
-    <figcaption>Extra neighboring text inside the crop.</figcaption>
-  </figure>
-</div>
-<p>The conclusion was clear: improving recognition required improving detection. A better recognizer can tolerate some noise, but it cannot reliably choose the intended line when the crop contains multiple plausible text sequences.</p>
-<h3 id="watershed-postprocessing">
-  Watershed Postprocessing
-  <a class="heading-link" href="#watershed-postprocessing">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>The next postprocessing idea was to treat line extraction as an instance-segmentation problem. The network already predicts two useful maps:</p>
-<ul>
-<li>line probability: where text centerlines are likely to be;</li>
-<li>separator probability: where neighboring lines should be split.</li>
-</ul>
-<p>The watershed postprocessor converts those maps into line instances. The idea is to create reliable markers from high-confidence line regions, restrict growth to a foreground band around line evidence, and use separator predictions as barriers between competing instances.</p>
-<h3 id="step-by-step-watershed-extraction">
-  Step-by-Step Watershed Extraction
-  <a class="heading-link" href="#step-by-step-watershed-extraction">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p><strong>1. Prepare the prediction maps.</strong> Very large maps are reduced to a bounded processing resolution. The line prediction is thresholded into a binary support map, and peaks in its row-wise density estimate the typical spacing between text lines on the page.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/watershed-probability-maps.jpg" alt="Line and separator probability maps used as watershed input">
-  <figcaption>Line and separator probability maps.</figcaption>
-</figure>
-<p><strong>2. Build markers and the foreground band.</strong> High-confidence line pixels are horizontally closed, filtered, and merged when their endpoint geometry and bridge support agree. A lower threshold then creates the foreground band, dilated vertically using the estimated line spacing. The markers are the seeds; the foreground band limits where they may grow.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/watershed-markers-foreground.jpg" alt="Watershed line markers and foreground band">
-  <figcaption>Watershed markers and foreground band.</figcaption>
-</figure>
-<p><strong>3. Grow, validate, and expand line instances.</strong> Watershed uses the elevation <code>1 - line_support + 0.2 * separator_probability</code>, so separator predictions act as barriers between neighboring lines. Tiny, narrow, and border-only regions are removed. Separator components near baseline endpoints estimate crop height, then the remaining masks expand competitively into the final recognition regions.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/watershed-instances-expanded-masks.jpg" alt="Watershed instances and expanded masks used for recognition crops">
-  <figcaption>Watershed instances and expanded recognition masks.</figcaption>
-</figure>
-<p>The separator map is important in two places. First, it raises the watershed elevation, making it harder for neighboring line instances to cross separator regions. Second, separator components help estimate line height near baseline endpoints. That gives better crops than relying only on a global line-spacing heuristic.</p>
-<p>Compared with graph-based connected components, watershed gives a denser interpretation of the page. Instead of starting from sparse superpixels and linking them into curves, it creates competing regions in image space. This is a better fit when line geometry is not cleanly represented by a small set of connected baseline points.</p>
-<div class="page-image-grid page-image-grid-2">
-  <figure>
-    <img src="/images/handwritten-ocr/watershed-success-example-1.jpg" alt="Successful watershed line instance extraction example">
-    <figcaption>Watershed follows the target line instance more tightly than an oriented rectangle.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/watershed-success-example-2.jpg" alt="Second successful watershed line instance extraction example">
-    <figcaption>Cleaner line isolation reduces extra neighboring text before recognition.</figcaption>
-  </figure>
-</div>
-<p>An important follow-up idea was to stop treating the oriented box as the final recognition object. Once watershed gives an instance mask, the crop does not have to be a pure rectangle anymore.
-This changes the problem. The bbox is only a container used to extract pixels from the page. The mask decides which pixels belong to the line. Extra neighboring text can be suppressed before the recognizer sees the crop.</p>
-<div class="wide-image-grid">
-  <figure>
-    <img src="/images/handwritten-ocr/watershed-mask-bbox.jpg" alt="Axis aligned bounding box around a watershed line mask">
-    <figcaption>Axis-aligned bbox around the watershed mask.</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/handwritten-ocr/watershed-masked-recognition-crop.jpg" alt="Recognition crop with watershed mask applied">
-    <figcaption>Recognition crop with the line mask applied.</figcaption>
-  </figure>
-</div>
-<p>This is useful because recognition is sensitive to additional text. If a
+positions available for the same crop without changing the recognizer interface.</p><h3 id=dataset-cleaning>Dataset Cleaning
+<a class=heading-link href=#dataset-cleaning><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>The next issue was not architectural. It was data quality.</p><p>For OCR datasets, it is easy to assume that the labels are correct because they came from an annotation pipeline. In practice, this assumption is dangerous. A recognizer trained on noisy labels can look like a weak model even when the architecture is fine.</p><p>I treated this as an active-learning cleanup problem:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>Train baseline recognizer
+</span></span><span class=line><span class=ln>2</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln>3</span><span class=cl>Evaluate training samples
+</span></span><span class=line><span class=ln>4</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln>5</span><span class=cl>Find suspicious samples by metrics
+</span></span><span class=line><span class=ln>6</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln>7</span><span class=cl>Inspect and clean labels/crops
+</span></span><span class=line><span class=ln>8</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln>9</span><span class=cl>Retrain recognizer
+</span></span></code></pre></div><p>The idea is simple: once the model is good enough, its largest training-set errors are often not &ldquo;hard examples&rdquo; anymore. Many of them are annotation problems, broken crops, or samples whose image does not match the target text.</p><p>For the check step, I used several metrics:</p><ul><li><strong>CER</strong>: normalized character error rate between prediction and label.</li><li><strong>Prediction confidence</strong>: low-confidence predictions are useful candidates for inspection.</li><li><strong>Region-type classifier confidence</strong>: high-confidence disagreement between expected and predicted type can reveal mislabeled regions.</li></ul><p>The main filters were:</p><ul><li>high <code>CER</code>;</li><li>high classifier confidence for a different region type;</li><li>low recognizer confidence combined with a large text mismatch.</li></ul><p>After sorting candidates by those signals and opening the images manually, several problems became obvious.</p><p>Some crops contained more than one text line. In those cases the model had no principled way to know which line the label referred to. The image might contain two readable lines, while the target contains only one of them:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>crop image:  line A + line B
+</span></span><span class=line><span class=ln>2</span><span class=cl>target:      line A
+</span></span><span class=line><span class=ln>3</span><span class=cl>model:       line B, or a mixture of both
+</span></span></code></pre></div><p>Those samples are especially harmful because the visual input and label are both valid text, but they do not describe the same recognition task.</p><figure class=wide-figure><img src=/images/handwritten-ocr/label-noise-multiline.jpg alt="Recognition crop containing multiple text lines"><figcaption>A crop containing multiple lines while the label describes only one of them.</figcaption></figure><p>This is particularly bad for CTC training: if the crop contains two lines, there is no single left-to-right target sequence, so the network can align the wrong line and learn noisy supervision. Removing these multiline samples made the training objective more consistent.</p><p>Other crops were simply messy: partial words, broken extraction, wrong region boundaries, or fragments where even a human would need surrounding context. Keeping those samples in training teaches the model inconsistent alignments.</p><figure class=wide-figure><img src=/images/handwritten-ocr/label-noise-bad-crop.jpg alt="Messy recognition crop with poor alignment or broken text"><figcaption>Expected text from label: "ти заяву про вихід з-під влади того уряду, то нащо тоді дава-", actually displayed: "ти заяву про".</figcaption></figure><p>I also used the classifier head to find region-type mismatches. For example, if a crop is labeled as handwritten but the classifier is highly confident that it is printed or formula-like, that sample becomes a review candidate.</p><p>The important part is that removal was not fully automatic. Metrics were used to rank suspicious samples, then the final decision was made by visual inspection. Multiline crops, broken crops, and clear wrong-label examples were moved out of the training set. After cleanup, the recognizer was trained again on the refined dataset.</p><p>Result after cleanup:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>ARUNet + CRNN + greedy CTC: 0.746
+</span></span></code></pre></div><h2 id=3-detection-improvements>3. Detection Improvements
+<a class=heading-link href=#3-detection-improvements><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><h3 id=detection-was-still-the-bottleneck>Detection Was Still the Bottleneck
+<a class=heading-link href=#detection-was-still-the-bottleneck><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>After the first end-to-end version, the result was useful but the error analysis pointed back to detection. The recognition model was already sensitive to crop quality: if a crop contained extra text from a neighboring line, or if the target line was cut too tightly, the recognizer could fail even when the text itself was readable.</p><p>Many pages were easy. When the lines were straight, well separated, and close to horizontal, the graph-based postprocessor produced good crops. These are the cases where the recognizer receives a clean line image and can do its job.</p><div class="page-image-grid page-image-grid-2"><figure><img src=/images/handwritten-ocr/detection-success-straight-lines_1.jpg alt="Successful line detection example on straight well separated handwriting"><figcaption>Straight, well-separated lines.</figcaption></figure><figure><img src=/images/handwritten-ocr/detection-success-straight-lines_2.jpg alt="Good recognition crop produced by clean line detection"><figcaption>Clean crop suitable for recognition.</figcaption></figure></div><p>But the dataset also contained harder layouts:</p><ul><li>pages with separated blocks of text;</li><li>curved baselines;</li><li>text written under a noticeable angle;</li><li>dense regions where neighboring lines were close;</li><li>crops where a small amount of extra text changed the recognizer output.</li></ul><p>The difficult cases were not always dramatic. Sometimes the oriented box looked reasonable, but the crop still included part of the line above or below. For CTC recognition, this is enough to break the assumption that one crop corresponds to one target sequence.</p><div class=page-image-grid><figure><img src=/images/handwritten-ocr/detection-failure-blocks.jpg alt="Detection failure example with separated text blocks or difficult line layout"><figcaption>Separated blocks and non-uniform line geometry.</figcaption></figure><figure><img src=/images/handwritten-ocr/detection-failure-curved-angle.jpg alt="Detection failure example with curved or angled handwriting"><figcaption>Curved or angled handwriting.</figcaption></figure><figure><img src=/images/handwritten-ocr/detection-failure-extra-text.jpg alt="Detection failure example where crop contains extra neighboring text"><figcaption>Extra neighboring text inside the crop.</figcaption></figure></div><p>The conclusion was clear: improving recognition required improving detection. A better recognizer can tolerate some noise, but it cannot reliably choose the intended line when the crop contains multiple plausible text sequences.</p><h3 id=watershed-postprocessing>Watershed Postprocessing
+<a class=heading-link href=#watershed-postprocessing><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>The next postprocessing idea was to treat line extraction as an instance-segmentation problem. The network already predicts two useful maps:</p><ul><li>line probability: where text centerlines are likely to be;</li><li>separator probability: where neighboring lines should be split.</li></ul><p>The watershed postprocessor converts those maps into line instances. The idea is to create reliable markers from high-confidence line regions, restrict growth to a foreground band around line evidence, and use separator predictions as barriers between competing instances.</p><h3 id=step-by-step-watershed-extraction>Step-by-Step Watershed Extraction
+<a class=heading-link href=#step-by-step-watershed-extraction><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p><strong>1. Prepare the prediction maps.</strong> Very large maps are reduced to a bounded processing resolution. The line prediction is thresholded into a binary support map, and peaks in its row-wise density estimate the typical spacing between text lines on the page.</p><figure class=wide-figure><img src=/images/handwritten-ocr/watershed-probability-maps.jpg alt="Line and separator probability maps used as watershed input"><figcaption>Line and separator probability maps.</figcaption></figure><p><strong>2. Build markers and the foreground band.</strong> High-confidence line pixels are horizontally closed, filtered, and merged when their endpoint geometry and bridge support agree. A lower threshold then creates the foreground band, dilated vertically using the estimated line spacing. The markers are the seeds; the foreground band limits where they may grow.</p><figure class=wide-figure><img src=/images/handwritten-ocr/watershed-markers-foreground.jpg alt="Watershed line markers and foreground band"><figcaption>Watershed markers and foreground band.</figcaption></figure><p><strong>3. Grow, validate, and expand line instances.</strong> Watershed uses the elevation <code>1 - line_support + 0.2 * separator_probability</code>, so separator predictions act as barriers between neighboring lines. Tiny, narrow, and border-only regions are removed. Separator components near baseline endpoints estimate crop height, then the remaining masks expand competitively into the final recognition regions.</p><figure class=wide-figure><img src=/images/handwritten-ocr/watershed-instances-expanded-masks.jpg alt="Watershed instances and expanded masks used for recognition crops"><figcaption>Watershed instances and expanded recognition masks.</figcaption></figure><p>The separator map is important in two places. First, it raises the watershed elevation, making it harder for neighboring line instances to cross separator regions. Second, separator components help estimate line height near baseline endpoints. That gives better crops than relying only on a global line-spacing heuristic.</p><p>Compared with graph-based connected components, watershed gives a denser interpretation of the page. Instead of starting from sparse superpixels and linking them into curves, it creates competing regions in image space. This is a better fit when line geometry is not cleanly represented by a small set of connected baseline points.</p><div class="page-image-grid page-image-grid-2"><figure><img src=/images/handwritten-ocr/watershed-success-example-1.jpg alt="Successful watershed line instance extraction example"><figcaption>Watershed follows the target line instance more tightly than an oriented rectangle.</figcaption></figure><figure><img src=/images/handwritten-ocr/watershed-success-example-2.jpg alt="Second successful watershed line instance extraction example"><figcaption>Cleaner line isolation reduces extra neighboring text before recognition.</figcaption></figure></div><p>An important follow-up idea was to stop treating the oriented box as the final recognition object. Once watershed gives an instance mask, the crop does not have to be a pure rectangle anymore.
+This changes the problem. The bbox is only a container used to extract pixels from the page. The mask decides which pixels belong to the line. Extra neighboring text can be suppressed before the recognizer sees the crop.</p><div class=wide-image-grid><figure><img src=/images/handwritten-ocr/watershed-mask-bbox.jpg alt="Axis aligned bounding box around a watershed line mask"><figcaption>Axis-aligned bbox around the watershed mask.</figcaption></figure><figure><img src=/images/handwritten-ocr/watershed-masked-recognition-crop.jpg alt="Recognition crop with watershed mask applied"><figcaption>Recognition crop with the line mask applied.</figcaption></figure></div><p>This is useful because recognition is sensitive to additional text. If a
 neighboring stroke is inside the rectangle but outside the instance mask, those
 pixels are filled with the mean crop color instead of being left as-is. I did
 not add a separate perspective transform at this stage; geometric normalization
 is handled inside the recognizer by the Spatial Transformer. The recognizer
 receives a cleaner visual sequence, while the detector keeps the more flexible
-geometry of the watershed instance.</p>
-<p>The goal was not to make postprocessing more complex for its own sake. The goal was to reduce extra text in recognition crops, because recognition quality was already limited by crop purity.</p>
-<p>Result after Watershed:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ARUNet(watershed) + CRNN + greedy CTC: 0.771
-</span></span></code></pre></div><hr>
-<h2 id="4-recognition-improvements">
-  4. Recognition Improvements
-  <a class="heading-link" href="#4-recognition-improvements">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<h3 id="beam-search-decoding">
-  Beam Search Decoding
-  <a class="heading-link" href="#beam-search-decoding">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>Even a strong recognizer produces uncertain outputs. Greedy CTC decoding takes
+geometry of the watershed instance.</p><p>The goal was not to make postprocessing more complex for its own sake. The goal was to reduce extra text in recognition crops, because recognition quality was already limited by crop purity.</p><p>Result after Watershed:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>ARUNet(watershed) + CRNN + greedy CTC: 0.771
+</span></span></code></pre></div><hr><h2 id=4-recognition-improvements>4. Recognition Improvements
+<a class=heading-link href=#4-recognition-improvements><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><h3 id=beam-search-decoding>Beam Search Decoding
+<a class=heading-link href=#beam-search-decoding><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>Even a strong recognizer produces uncertain outputs. Greedy CTC decoding takes
 the best character at each time step and then collapses repeats and blanks. It
 is fast, but it throws away useful alternatives. Beam search keeps several
 possible prefixes alive while scanning the CTC output, so the final decision can
-use more than only the locally best visual character.</p>
-<p>That matters because the recognizer often produces ambiguous probabilities:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">visual crop -&gt; CTC probabilities -&gt; beam hypotheses
-</span></span><span class="line"><span class="ln">2</span><span class="cl">                                  -&gt; &#34;земля&#34;
-</span></span><span class="line"><span class="ln">3</span><span class="cl">                                  -&gt; &#34;земла&#34;
-</span></span><span class="line"><span class="ln">4</span><span class="cl">                                  -&gt; &#34;земпя&#34;
+use more than only the locally best visual character.</p><p>That matters because the recognizer often produces ambiguous probabilities:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>visual crop -&gt; CTC probabilities -&gt; beam hypotheses
+</span></span><span class=line><span class=ln>2</span><span class=cl>                                  -&gt; &#34;земля&#34;
+</span></span><span class=line><span class=ln>3</span><span class=cl>                                  -&gt; &#34;земла&#34;
+</span></span><span class=line><span class=ln>4</span><span class=cl>                                  -&gt; &#34;земпя&#34;
 </span></span></code></pre></div><p>The visual model proposes several plausible readings. The decoder decides which
-one survives.</p>
-<h3 id="character-level-rnn-language-model">
-  Character-Level RNN Language Model
-  <a class="heading-link" href="#character-level-rnn-language-model">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>Using only visual information is a lightweight starting point and already gives
+one survives.</p><h3 id=character-level-rnn-language-model>Character-Level RNN Language Model
+<a class=heading-link href=#character-level-rnn-language-model><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>Using only visual information is a lightweight starting point and already gives
 usable initial results, but it ignores a simple fact: text has structure. Some
 character sequences are common, some are rare, and some are almost impossible in
 the target language or domain. Adding this linguistic information during
 decoding is a standard way to improve CTC-style recognizers. Similar ideas are
 used in joint CTC/attention speech recognition with an external RNN-LM
-(<a href="https://arxiv.org/abs/1706.02737" title="Advances in Joint CTC-Attention based End-to-End Speech Recognition with a Deep CNN Encoder and RNN-LM"  class="external-link" target="_blank" rel="noopener">Advances in Joint CTC-Attention based End-to-End Speech Recognition with a Deep CNN Encoder and RNN-LM</a>)
+(<a href=https://arxiv.org/abs/1706.02737 title="Advances in Joint CTC-Attention based End-to-End Speech Recognition with a Deep CNN Encoder and RNN-LM" class=external-link target=_blank rel=noopener>Advances in Joint CTC-Attention based End-to-End Speech Recognition with a Deep CNN Encoder and RNN-LM</a>)
 and in OCR systems such as PyLaia
-(<a href="https://arxiv.org/abs/2404.18722" title="Improving Automatic Text Recognition with Language Models in the PyLaia Open-Source Library"  class="external-link" target="_blank" rel="noopener">Improving Automatic Text Recognition with Language Models in the PyLaia Open-Source Library</a>).</p>
-<p>For this step I trained a small 2-layer LSTM language model. The training
+(<a href=https://arxiv.org/abs/2404.18722 title="Improving Automatic Text Recognition with Language Models in the PyLaia Open-Source Library" class=external-link target=_blank rel=noopener>Improving Automatic Text Recognition with Language Models in the PyLaia Open-Source Library</a>).</p><p>For this step I trained a small 2-layer LSTM language model. The training
 corpus combined the original OCR texts with additional Ukrainian text mined
 from the Internet. The validation perplexity ended up around <code>6.0</code>, which was
 good enough to provide a useful decoding prior without turning the LM into the
-main source of prediction.</p>
-<p>During decoding, the language model does not replace the recognizer. It only
-adds a score to each beam expansion:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">score(prefix + c) = CTC_prefix_score(prefix + c) + lambda_lm * log P_lm(c | prefix)
+main source of prediction.</p><p>During decoding, the language model does not replace the recognizer. It only
+adds a score to each beam expansion:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>score(prefix + c) = CTC_prefix_score(prefix + c) + lambda_lm * log P_lm(c | prefix)
 </span></span></code></pre></div><p>The decoder keeps an RNN hidden state for every active beam. When several beams
 need the next-character distribution, they are scored together in a batch, so
 the integration stays cheap. If the recognizer and the LM use slightly different
 character vocabularies, a small vocabulary mapping is used before adding the LM
-score.</p>
-<p>The practical effect is modest but useful: the visual model still decides what
+score.</p><p>The practical effect is modest but useful: the visual model still decides what
 is visible in the crop, while the language model nudges uncertain hypotheses
 toward more plausible text. It cannot fix a bad line crop or missing characters,
 and too much LM weight can make the decoder hallucinate common text. For this
-reason the LM weight is a decoding hyperparameter, not a hard correction rule.</p>
-<p>Result after adding RNN-LM rescoring:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ARUNet + CRNN + joined CTC/LM rescoring: 0.794
-</span></span></code></pre></div><h3 id="beyond-crnn-conformer-recognizer">
-  Beyond CRNN: Conformer Recognizer
-  <a class="heading-link" href="#beyond-crnn-conformer-recognizer">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>The CRNN baseline was useful, but it was not the end of the recognition story.
+reason the LM weight is a decoding hyperparameter, not a hard correction rule.</p><p>Result after adding RNN-LM rescoring:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>ARUNet + CRNN + joined CTC/LM rescoring: 0.794
+</span></span></code></pre></div><h3 id=beyond-crnn-conformer-recognizer>Beyond CRNN: Conformer Recognizer
+<a class=heading-link href=#beyond-crnn-conformer-recognizer><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>The CRNN baseline was useful, but it was not the end of the recognition story.
 Handwritten lines often need wider context: repeated shapes, long words,
 abbreviations, and characters that are only clear after looking at neighboring
-strokes.</p>
-<p>So I replaced the recurrent sequence encoder with a Conformer-style recognizer,
-following <a href="https://arxiv.org/abs/2005.08100" title="Conformer: Convolution-augmented Transformer for Speech Recognition"  class="external-link" target="_blank" rel="noopener">Conformer: Convolution-augmented Transformer for Speech Recognition</a>.
+strokes.</p><p>So I replaced the recurrent sequence encoder with a Conformer-style recognizer,
+following <a href=https://arxiv.org/abs/2005.08100 title="Conformer: Convolution-augmented Transformer for Speech Recognition" class=external-link target=_blank rel=noopener>Conformer: Convolution-augmented Transformer for Speech Recognition</a>.
 The model still starts with CNN visual features, but the sequence is processed
 by Conformer encoder blocks. A 3-layer Transformer attention decoder sits on
-top:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln"> 1</span><span class="cl">line crop
-</span></span><span class="line"><span class="ln"> 2</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln"> 3</span><span class="cl">CNN visual features
-</span></span><span class="line"><span class="ln"> 4</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln"> 5</span><span class="cl">linear projection + positional encoding
-</span></span><span class="line"><span class="ln"> 6</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln"> 7</span><span class="cl">Conformer encoder blocks
-</span></span><span class="line"><span class="ln"> 8</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln"> 9</span><span class="cl">CTC head
-</span></span><span class="line"><span class="ln">10</span><span class="cl">    ↓
-</span></span><span class="line"><span class="ln">11</span><span class="cl">Transformer attention decoder
+top:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln> 1</span><span class=cl>line crop
+</span></span><span class=line><span class=ln> 2</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln> 3</span><span class=cl>CNN visual features
+</span></span><span class=line><span class=ln> 4</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln> 5</span><span class=cl>linear projection + positional encoding
+</span></span><span class=line><span class=ln> 6</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln> 7</span><span class=cl>Conformer encoder blocks
+</span></span><span class=line><span class=ln> 8</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln> 9</span><span class=cl>CTC head
+</span></span><span class=line><span class=ln>10</span><span class=cl>    ↓
+</span></span><span class=line><span class=ln>11</span><span class=cl>Transformer attention decoder
 </span></span></code></pre></div><p>This gives two useful signals at the same time: self-attention for long-range
 dependencies and convolution for local stroke patterns. In practice, this is the
 right direction once the baseline recognizer is stable and the remaining errors
-are no longer only caused by bad crops.</p>
-<h3 id="guided-ctc-training">
-  Guided CTC Training
-  <a class="heading-link" href="#guided-ctc-training">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>Problem: CTC learns alignment slowly. It is efficient, but the alignment between
-visual timesteps and output characters is hidden during training.</p>
-<p>Solution: use the idea from
-<a href="https://arxiv.org/abs/2002.01276" title="GTC: Guided Training of CTC Towards Efficient and Accurate Scene Text Recognition"  class="external-link" target="_blank" rel="noopener">GTC: Guided Training of CTC Towards Efficient and Accurate Scene Text Recognition</a>.
+are no longer only caused by bad crops.</p><h3 id=guided-ctc-training>Guided CTC Training
+<a class=heading-link href=#guided-ctc-training><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>Problem: CTC learns alignment slowly. It is efficient, but the alignment between
+visual timesteps and output characters is hidden during training.</p><p>Solution: use the idea from
+<a href=https://arxiv.org/abs/2002.01276 title="GTC: Guided Training of CTC Towards Efficient and Accurate Scene Text Recognition" class=external-link target=_blank rel=noopener>GTC: Guided Training of CTC Towards Efficient and Accurate Scene Text Recognition</a>.
 The model uses one shared encoder with two heads: a CTC head for monotonic text
 prediction and an attention decoder head for sequence modeling. Training uses a
-weighted sum of the two losses, plus a small region-type classification term:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">L = 0.4 * L_ctc + 0.6 * L_attn + 0.1 * L_region
+weighted sum of the two losses, plus a small region-type classification term:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>L = 0.4 * L_ctc + 0.6 * L_attn + 0.1 * L_region
 </span></span></code></pre></div><p>The attention head guides the shared encoder by backpropagating through the same
 trunk, so the CTC path learns alignment faster while the attention branch keeps
-sequence context available.</p>
-<p>Result: the recognizer improved across categories. The baseline CRNN had
+sequence context available.</p><p>Result: the recognizer improved across categories. The baseline CRNN had
 <code>CER = 0.20</code>, while the Conformer + Guided CTC model reached about
-<code>CER = 0.12</code>.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/cer-by-region-type.svg" alt="Bar chart comparing CRNN and Conformer Guided CTC character error rate for formula, handwritten, and printed text">
-  <figcaption>Character error rate by region type. Lower is better; Conformer + Guided CTC improves every measured category.</figcaption>
-</figure>
-<p>Result after Conformer + Guided CTC:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ARUNet + Conformer + Guided CTC: 0.804
-</span></span></code></pre></div><h3 id="joint-attention-ctc-and-lm-decoder">
-  Joint Attention, CTC, and LM Decoder
-  <a class="heading-link" href="#joint-attention-ctc-and-lm-decoder">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h3>
-<p>The last step was to use all available scores during decoding. Instead of
-choosing only CTC or only attention, the beam decoder combines three signals:</p>
-<ul>
-<li>attention score: does the next character fit the output prefix?</li>
-<li>CTC prefix score: can it be aligned to the visual frames?</li>
-<li>RNN-LM score: is the character sequence plausible?</li>
-</ul>
-<p>The combined score for extending a beam is:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">combined_delta = 0.6 * attention_delta + 0.4 * ctc_delta + 0.5 * lm_delta
-</span></span></code></pre></div><figure class="wide-figure">
-  <img src="/images/handwritten-ocr/joint-decoder-attention-ctc-lm.jpg" alt="Joint decoder combining attention, CTC prefix score, and RNN language model score">
-  <figcaption>Attention proposes the next token, CTC checks visual alignment, and the RNN-LM adds linguistic plausibility before the beam is pruned.</figcaption>
-</figure>
-<p>This decoder is more expensive than greedy CTC, but it is still only a
+<code>CER = 0.12</code>.</p><figure class=wide-figure><img src=/images/handwritten-ocr/cer-by-region-type.svg alt="Bar chart comparing CRNN and Conformer Guided CTC character error rate for formula, handwritten, and printed text"><figcaption>Character error rate by region type. Lower is better; Conformer + Guided CTC improves every measured category.</figcaption></figure><p>Result after Conformer + Guided CTC:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>ARUNet + Conformer + Guided CTC: 0.804
+</span></span></code></pre></div><h3 id=joint-attention-ctc-and-lm-decoder>Joint Attention, CTC, and LM Decoder
+<a class=heading-link href=#joint-attention-ctc-and-lm-decoder><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h3><p>The last step was to use all available scores during decoding. Instead of
+choosing only CTC or only attention, the beam decoder combines three signals:</p><ul><li>attention score: does the next character fit the output prefix?</li><li>CTC prefix score: can it be aligned to the visual frames?</li><li>RNN-LM score: is the character sequence plausible?</li></ul><p>The combined score for extending a beam is:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>combined_delta = 0.6 * attention_delta + 0.4 * ctc_delta + 0.5 * lm_delta
+</span></span></code></pre></div><figure class=wide-figure><img src=/images/handwritten-ocr/joint-decoder-attention-ctc-lm.jpg alt="Joint decoder combining attention, CTC prefix score, and RNN language model score"><figcaption>Attention proposes the next token, CTC checks visual alignment, and the RNN-LM adds linguistic plausibility before the beam is pruned.</figcaption></figure><p>This decoder is more expensive than greedy CTC, but it is still only a
 line-level decoder. It does not solve document consistency, and it still cannot
 fix a bad crop. But for clean crops it reduces ambiguity: CTC anchors the output
 to the image, attention improves sequence modeling, and the language model
-nudges uncertain choices toward plausible text.</p>
-<p>Together, the Conformer recognizer, guided CTC training, and joint
-Attention/CTC/LM decoding improved the final score further:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">ARUNet (watershed) + Conformer + Hybrid Decoder (CTC + Att + LM): 0.811
-</span></span></code></pre></div><h2 id="6-remaining-failure-modes">
-  6. Remaining Failure Modes
-  <a class="heading-link" href="#6-remaining-failure-modes">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<p>The final pipeline is much stronger than the baseline, but the remaining errors
+nudges uncertain choices toward plausible text.</p><p>Together, the Conformer recognizer, guided CTC training, and joint
+Attention/CTC/LM decoding improved the final score further:</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>ARUNet (watershed) + Conformer + Hybrid Decoder (CTC + Att + LM): 0.811
+</span></span></code></pre></div><h2 id=6-remaining-failure-modes>6. Remaining Failure Modes
+<a class=heading-link href=#6-remaining-failure-modes><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><p>The final pipeline is much stronger than the baseline, but the remaining errors
 are still informative. They mainly come from ambiguous line instances and from
-recognition crops where visual evidence is genuinely weak.</p>
-<p><strong>Irregular and angled text.</strong> Even with better postprocessing, these layouts
+recognition crops where visual evidence is genuinely weak.</p><p><strong>Irregular and angled text.</strong> Even with better postprocessing, these layouts
 remain difficult. The baseline target is derived from the bbox centerline,
 which can be inaccurate for irregular lines, and the dataset contains relatively
 few such examples. A practical next step is to use a trained network to help
-relabel these pages and expand the training set with more complex cases.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/watershed-merged-clusters-failure.jpg" alt="Watershed failure where two neighboring text lines are merged into one instance">
-  <figcaption>Failure case: weak separation causes two neighboring text lines to merge into one watershed instance.</figcaption>
-</figure>
-<p><strong>Difficult recognition crops.</strong> Some lines remain ambiguous even for a human
+relabel these pages and expand the training set with more complex cases.</p><figure class=wide-figure><img src=/images/handwritten-ocr/watershed-merged-clusters-failure.jpg alt="Watershed failure where two neighboring text lines are merged into one instance"><figcaption>Failure case: weak separation causes two neighboring text lines to merge into one watershed instance.</figcaption></figure><p><strong>Difficult recognition crops.</strong> Some lines remain ambiguous even for a human
 reader. A useful next step is to include a small amount of surrounding document
 context and pass it with the OCR hypothesis to a vision-language model that can
-correct the transcription.</p>
-<figure class="wide-figure">
-  <img src="/images/handwritten-ocr/recognition-failure-example.jpg" alt="Difficult handwritten recognition crop with an incorrect transcription">
-  <figcaption>Predicted text: "двількнути вселяку шпура в позетку". Target: "увімкнути вилку шнура в розетку".</figcaption>
-</figure>
-<h2 id="7-negative-results">
-  7. Negative Results
-  <a class="heading-link" href="#7-negative-results">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<p>Many OCR errors were small enough that the intended word still looked obvious.
-I explored several text-only post-processing approaches to correct them.</p>
-<p><strong>OCR Correction with Ranking.</strong></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="ln">1</span><span class="cl">OCR token -&gt; candidate words -&gt; candidate ranking
+correct the transcription.</p><figure class=wide-figure><img src=/images/handwritten-ocr/recognition-failure-example.jpg alt="Difficult handwritten recognition crop with an incorrect transcription"><figcaption>Predicted text: "двількнути вселяку шпура в позетку". Target: "увімкнути вилку шнура в розетку".</figcaption></figure><h2 id=7-negative-results>7. Negative Results
+<a class=heading-link href=#7-negative-results><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><p>Many OCR errors were small enough that the intended word still looked obvious.
+I explored several text-only post-processing approaches to correct them.</p><p><strong>OCR Correction with Ranking.</strong></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=ln>1</span><span class=cl>OCR token -&gt; candidate words -&gt; candidate ranking
 </span></span></code></pre></div><p>This follows the candidate-generation + ranking shape that classical
-search and IR systems use:</p>
-<ul>
-<li>Candidate generation (SymSpell + beam search). <a href="https://seekstorm.com/blog/1000x-spelling-correction/" title="SymSpell: 1,000,000x Faster Spelling Correction"  class="external-link" target="_blank" rel="noopener">SymSpell</a>
+search and IR systems use:</p><ul><li>Candidate generation (SymSpell + beam search). <a href=https://seekstorm.com/blog/1000x-spelling-correction/ title="SymSpell: 1,000,000x Faster Spelling Correction" class=external-link target=_blank rel=noopener>SymSpell</a>
 produced per-token dictionary candidates within a small edit
 distance, using a symmetric-delete index for fast lookup. A beam
 search then combined per-token candidates into whole-line
-corrections, keeping only the most promising prefixes.</li>
-<li>Ranking (bidirectional RNN-LM + priors). Two RNN language
+corrections, keeping only the most promising prefixes.</li><li>Ranking (bidirectional RNN-LM + priors). Two RNN language
 models — one running left-to-right, one right-to-left — scored each
 candidate line using context from both sides of every word.
 Frequency priors and edit-distance penalties kept the correction
-conservative.</li>
-</ul>
-<p>The pipeline did not improve the final score consistently. The
+conservative.</li></ul><p>The pipeline did not improve the final score consistently. The
 underlying assumption — that the correct word is a dictionary entry
 close to the observed token — does not hold for handwritten Ukrainian
 text. Historical spelling, names, and uncommon terms are valid
 out-of-vocabulary tokens, and the ranker could not separate them from
 genuine OCR errors. In practice, the correction stage sometimes
 replaced a correct OOV token with a more common but wrong one, so I
-left it out of the final pipeline.</p>
-<p><strong>CharacterBERT with CTC.</strong> A character-level BERT encoder with a CTC head maps
+left it out of the final pipeline.</p><p><strong>CharacterBERT with CTC.</strong> A character-level BERT encoder with a CTC head maps
 noisy OCR lines directly to clean text. Self-attention lets
 each character use the whole line as context, while CTC can handle insertions,
 deletions, and length changes without a fixed character alignment. This should
 work when most of the phrase is clear and only a few words contain small OCR
-errors.</p>
-<p>It did not improve the results. In many difficult examples, several words in
+errors.</p><p>It did not improve the results. In many difficult examples, several words in
 the same phrase were corrupted, leaving too little reliable context for the
 model to infer the intended text. Ukrainian morphology also makes this a hard
-language-modeling problem for a small BERT trained on limited data.</p>
-<p><strong>WFST OCR Correction.</strong> A similar idea is described in <a href="https://link.springer.com/content/pdf/10.1007/978-3-642-14980-1_72.pdf" title="Efficient OCR Post-Processing Combining Language, Hypothesis and Error Models"  class="external-link" target="_blank" rel="noopener">Efficient OCR Post-Processing Combining Language,
+language-modeling problem for a small BERT trained on limited data.</p><p><strong>WFST OCR Correction.</strong> A similar idea is described in <a href=https://link.springer.com/content/pdf/10.1007/978-3-642-14980-1_72.pdf title="Efficient OCR Post-Processing Combining Language, Hypothesis and Error Models" class=external-link target=_blank rel=noopener>Efficient OCR Post-Processing Combining Language,
 Hypothesis and Error Models</a>. The decoder composes the OCR
 or CTC hypothesis graph with a learned character-error model, an optional
 lexicon, and a character language model. The shortest path through the
-combined graph is the correction with the best total cost.</p>
-<p>This is an attractive structured formulation because it keeps each source of
+combined graph is the correction with the best total cost.</p><p>This is an attractive structured formulation because it keeps each source of
 evidence explicit. It did not improve the final score consistently, however:
 when a whole line is uncertain, local error rules and lexical constraints still
-cannot recover enough reliable context to select the correct text.</p>
-<hr>
-<h2 id="final-score-evolution">
-  Final Score Evolution
-  <a class="heading-link" href="#final-score-evolution">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<p>The rows below are cumulative unless noted otherwise: each step starts from the
-previous best pipeline and adds the listed change.</p>
-<table>
-	<thead>
-			<tr>
-					<th>Main Change</th>
-					<th>Score</th>
-			</tr>
-	</thead>
-	<tbody>
-			<tr>
-					<td>ARUNet + CRNN</td>
-					<td>0.746</td>
-			</tr>
-			<tr>
-					<td>ARUNet + CRNN + LM rescoring</td>
-					<td>0.794</td>
-			</tr>
-			<tr>
-					<td>ARUNet (watershed) + Conformer + Guided CTC</td>
-					<td>0.804</td>
-			</tr>
-			<tr>
-					<td>ARUNet (watershed) + Conformer + Hybrid Decoder (CTC + Att + LM)</td>
-					<td>0.811</td>
-			</tr>
-	</tbody>
-</table>
-<p>Model size summary:</p>
-<ul>
-<li>ARUNet detector: 3.9M parameters.</li>
-<li>RNN language model: 3.6M parameters.</li>
-<li>Conformer recognizer: 12.4M parameters.</li>
-</ul>
-<p>The final 0.811 puts the pipeline at <strong>74th</strong> on the competition
+cannot recover enough reliable context to select the correct text.</p><hr><h2 id=final-score-evolution>Final Score Evolution
+<a class=heading-link href=#final-score-evolution><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><p>The rows below are cumulative unless noted otherwise: each step starts from the
+previous best pipeline and adds the listed change.</p><table><thead><tr><th>Main Change</th><th>Score</th></tr></thead><tbody><tr><td>ARUNet + CRNN</td><td>0.746</td></tr><tr><td>ARUNet + CRNN + LM rescoring</td><td>0.794</td></tr><tr><td>ARUNet (watershed) + Conformer + Guided CTC</td><td>0.804</td></tr><tr><td>ARUNet (watershed) + Conformer + Hybrid Decoder (CTC + Att + LM)</td><td>0.811</td></tr></tbody></table><p>Model size summary:</p><ul><li>ARUNet detector: 3.9M parameters.</li><li>RNN language model: 3.6M parameters.</li><li>Conformer recognizer: 12.4M parameters.</li></ul><p>The final 0.811 puts the pipeline at <strong>74th</strong> on the competition
 leaderboard, with the top of the table reaching 0.92. The 0.11 gap to
 the top is real, and there is meaningful headroom that this stack does
-not capture.</p>
-<hr>
-<h2 id="references">
-  References
-  <a class="heading-link" href="#references">
-    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
-    <span class="sr-only">Link to heading</span>
-  </a>
-</h2>
-<ol>
-<li>Grüning, Tobias, Gundram Leifert, Tobias Strauß, Johannes Michael, and Roger Labahn. 2018. “A Two-Stage Method for Text Line Detection in Historical Documents.” arXiv. <a href="https://arxiv.org/abs/1802.03345"  class="external-link" target="_blank" rel="noopener">https://arxiv.org/abs/1802.03345</a>.</li>
-<li>Retsinas, George, Giorgos Sfikas, Basilis Gatos, and Christophoros Nikou. 2024. “Best Practices for a Handwritten Text Recognition System.” arXiv. <a href="https://arxiv.org/abs/2404.11339"  class="external-link" target="_blank" rel="noopener">https://arxiv.org/abs/2404.11339</a>.</li>
-<li>Hori, Takaaki, Shinji Watanabe, Yu Zhang, and William Chan. 2017. “Advances in Joint CTC-Attention Based End-to-End Speech Recognition with a Deep CNN Encoder and RNN-LM.” arXiv. <a href="https://arxiv.org/abs/1706.02737"  class="external-link" target="_blank" rel="noopener">https://arxiv.org/abs/1706.02737</a>.</li>
-<li>Tarride, Solène, Yoann Schneider, Marie Generali-Lince, Mélodie Boillet, Bastien Abadie, and Christopher Kermorvant. 2024. “Improving Automatic Text Recognition with Language Models in the PyLaia Open-Source Library.” arXiv. <a href="https://arxiv.org/abs/2404.18722"  class="external-link" target="_blank" rel="noopener">https://arxiv.org/abs/2404.18722</a>.</li>
-<li>Hu, Wenyang, Xiaocong Cai, Jun Hou, Shuai Yi, and Zhiping Lin. 2020. “GTC: Guided Training of CTC Towards Efficient and Accurate Scene Text Recognition.” arXiv. <a href="https://arxiv.org/abs/2002.01276"  class="external-link" target="_blank" rel="noopener">https://arxiv.org/abs/2002.01276</a>.</li>
-<li>Gulati, Anmol, James Qin, Chung-Cheng Chiu, Niki Parmar, Yu Zhang, Jiahui Yu, Wei Han, Shibo Wang, Zhengdong Zhang, Yonghui Wu, and Ruoming Pang. 2020. “Conformer: Convolution-Augmented Transformer for Speech Recognition.” arXiv. <a href="https://arxiv.org/abs/2005.08100"  class="external-link" target="_blank" rel="noopener">https://arxiv.org/abs/2005.08100</a>.</li>
-<li>Hannun, Awni. 2017. “Sequence Modeling with CTC.” Distill. <a href="https://doi.org/10.23915/distill.00008"  class="external-link" target="_blank" rel="noopener">https://doi.org/10.23915/distill.00008</a>.</li>
-<li>Kaggle. 2026. “Handwritten to Data.” Kaggle Competition. <a href="https://www.kaggle.com/competitions/handwritten-to-data"  class="external-link" target="_blank" rel="noopener">https://www.kaggle.com/competitions/handwritten-to-data</a>.</li>
-<li>Garbe, Wolf. 2012. “1000x Faster Spelling Correction Algorithm.” SeekStorm. <a href="https://seekstorm.com/blog/1000x-spelling-correction/"  class="external-link" target="_blank" rel="noopener">https://seekstorm.com/blog/1000x-spelling-correction/</a>.</li>
-<li>Llobet, Rafael, J. Ramon Navarro-Cerdan, Juan-Carlos Perez-Cortes, and Joaquim Arlandis. 2010. “Efficient OCR Post-Processing Combining Language, Hypothesis and Error Models.” Lecture Notes in Computer Science 6218: 728-737. <a href="https://doi.org/10.1007/978-3-642-14980-1_72"  class="external-link" target="_blank" rel="noopener">https://doi.org/10.1007/978-3-642-14980-1_72</a>.</li>
-</ol>
-
-      </div>
-
-
-      <footer>
-        
-
-<section class="see-also">
-  
-    
-    
-    
-  
-</section>
-
-
-        
-        
-        
-        
-        
-        
-        
-      </footer>
-    </article>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
-    integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
-  
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
-    integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
-    integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
-    onload="renderMathInElement(document.body,
-      {
-        delimiters: [
-          {left: '$$', right: '$$', display:true},
-          {left: '$', right: '$', display:false},
-          {left: '\\(', right: '\\)', display: false},
-          {left: '\\[', right: '\\]', display: true}
-        ]
-      }
-    );"></script>
-  </section>
-
-    </div>
-
-    <footer class="footer">
-  <section class="container">
-    ©
-    
-    2026
-     Andrii 
-    ·
-    
-    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
-    
-  </section>
-</footer>
-
-  </main>
-
-  
-
-  
-  
-  <script src="/js/coder.js"></script>
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</body>
-
-</html>
+not capture.</p><hr><h2 id=references>References
+<a class=heading-link href=#references><i class="fa-solid fa-link" aria-hidden=true title="Link to heading"></i>
+<span class=sr-only>Link to heading</span></a></h2><ol><li>Grüning, Tobias, Gundram Leifert, Tobias Strauß, Johannes Michael, and Roger Labahn. 2018. “A Two-Stage Method for Text Line Detection in Historical Documents.” arXiv. <a href=https://arxiv.org/abs/1802.03345 class=external-link target=_blank rel=noopener>https://arxiv.org/abs/1802.03345</a>.</li><li>Retsinas, George, Giorgos Sfikas, Basilis Gatos, and Christophoros Nikou. 2024. “Best Practices for a Handwritten Text Recognition System.” arXiv. <a href=https://arxiv.org/abs/2404.11339 class=external-link target=_blank rel=noopener>https://arxiv.org/abs/2404.11339</a>.</li><li>Hori, Takaaki, Shinji Watanabe, Yu Zhang, and William Chan. 2017. “Advances in Joint CTC-Attention Based End-to-End Speech Recognition with a Deep CNN Encoder and RNN-LM.” arXiv. <a href=https://arxiv.org/abs/1706.02737 class=external-link target=_blank rel=noopener>https://arxiv.org/abs/1706.02737</a>.</li><li>Tarride, Solène, Yoann Schneider, Marie Generali-Lince, Mélodie Boillet, Bastien Abadie, and Christopher Kermorvant. 2024. “Improving Automatic Text Recognition with Language Models in the PyLaia Open-Source Library.” arXiv. <a href=https://arxiv.org/abs/2404.18722 class=external-link target=_blank rel=noopener>https://arxiv.org/abs/2404.18722</a>.</li><li>Hu, Wenyang, Xiaocong Cai, Jun Hou, Shuai Yi, and Zhiping Lin. 2020. “GTC: Guided Training of CTC Towards Efficient and Accurate Scene Text Recognition.” arXiv. <a href=https://arxiv.org/abs/2002.01276 class=external-link target=_blank rel=noopener>https://arxiv.org/abs/2002.01276</a>.</li><li>Gulati, Anmol, James Qin, Chung-Cheng Chiu, Niki Parmar, Yu Zhang, Jiahui Yu, Wei Han, Shibo Wang, Zhengdong Zhang, Yonghui Wu, and Ruoming Pang. 2020. “Conformer: Convolution-Augmented Transformer for Speech Recognition.” arXiv. <a href=https://arxiv.org/abs/2005.08100 class=external-link target=_blank rel=noopener>https://arxiv.org/abs/2005.08100</a>.</li><li>Hannun, Awni. 2017. “Sequence Modeling with CTC.” Distill. <a href=https://doi.org/10.23915/distill.00008 class=external-link target=_blank rel=noopener>https://doi.org/10.23915/distill.00008</a>.</li><li>Kaggle. 2026. “Handwritten to Data.” Kaggle Competition. <a href=https://www.kaggle.com/competitions/handwritten-to-data class=external-link target=_blank rel=noopener>https://www.kaggle.com/competitions/handwritten-to-data</a>.</li><li>Garbe, Wolf. 2012. “1000x Faster Spelling Correction Algorithm.” SeekStorm. <a href=https://seekstorm.com/blog/1000x-spelling-correction/ class=external-link target=_blank rel=noopener>https://seekstorm.com/blog/1000x-spelling-correction/</a>.</li><li>Llobet, Rafael, J. Ramon Navarro-Cerdan, Juan-Carlos Perez-Cortes, and Joaquim Arlandis. 2010. “Efficient OCR Post-Processing Combining Language, Hypothesis and Error Models.” Lecture Notes in Computer Science 6218: 728-737. <a href=https://doi.org/10.1007/978-3-642-14980-1_72 class=external-link target=_blank rel=noopener>https://doi.org/10.1007/978-3-642-14980-1_72</a>.</li></ol></div><footer><section class=see-also></section></footer></article><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css integrity=sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0 crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js integrity=sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4 crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js integrity=sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05 crossorigin=anonymous onload='renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1},{left:"\\(",right:"\\)",display:!1},{left:"\\[",right:"\\]",display:!0}]})'></script></section></div><footer class=footer><section class=container>©
+2026
+Andrii
+·
+Powered by <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> & <a href=https://github.com/luizdepra/hugo-coder/ target=_blank rel=noopener>Coder</a>.</section></footer></main><script src=/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script></body></html>

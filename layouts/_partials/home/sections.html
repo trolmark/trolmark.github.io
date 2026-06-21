@@ -1,0 +1,18 @@
+{{ $posts := where .Site.RegularPages "Section" "posts" }}
+{{ with $posts }}
+  <section class="container list">
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="{{ "posts/" | relURL }}">Posts</a>
+      </h1>
+    </header>
+    <ul>
+      {{ range first 10 .ByDate.Reverse }}
+        <li>
+          <span class="date">{{ .Date | time.Format (.Site.Params.dateFormat | default "January 2, 2006") }}</span>
+          <a class="title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </li>
+      {{ end }}
+    </ul>
+  </section>
+{{ end }}
