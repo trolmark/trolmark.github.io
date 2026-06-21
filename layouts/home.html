@@ -1,3 +1,12 @@
-{{ define "content" }}
-  {{ partial "home/sections.html" . }}
-{{ end }}
+<!doctype html>
+<html lang="{{ .Site.Language.Lang }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="refresh" content="0; url={{ "posts/" | absURL }}">
+    <link rel="canonical" href="{{ "posts/" | absURL }}">
+    <title>Redirecting to posts</title>
+  </head>
+  <body>
+    <a href="{{ "posts/" | absURL }}">Posts</a>
+  </body>
+</html>
