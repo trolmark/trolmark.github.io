@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title description">
+  <title id="title">Character error rate by region type</title>
+  <desc id="description">Grouped bar chart comparing CRNN and Conformer plus Guided CTC on formula, handwritten, and printed text. Lower CER is better.</desc>
+  <rect width="960" height="500" fill="#fbfaf4"/>
+  <g font-family="Arial, sans-serif">
+    <text x="140" y="38" fill="#252a25" font-size="24" font-weight="600">CER by region type</text>
+    <text x="140" y="61" fill="#5b655d" font-size="15">Lower is better</text>
+
+    <g stroke="#d8ddd4" stroke-width="1">
+      <line x1="140" y1="70" x2="880" y2="70"/>
+      <line x1="140" y1="145" x2="880" y2="145"/>
+      <line x1="140" y1="220" x2="880" y2="220"/>
+      <line x1="140" y1="295" x2="880" y2="295"/>
+      <line x1="140" y1="370" x2="880" y2="370"/>
+    </g>
+    <g fill="#5b655d" font-size="14" text-anchor="end">
+      <text x="126" y="75">0.40</text>
+      <text x="126" y="150">0.30</text>
+      <text x="126" y="225">0.20</text>
+      <text x="126" y="300">0.10</text>
+      <text x="126" y="375">0.00</text>
+    </g>
+    <line x1="140" y1="70" x2="140" y2="370" stroke="#7d877f" stroke-width="1.5"/>
+    <line x1="140" y1="370" x2="880" y2="370" stroke="#7d877f" stroke-width="1.5"/>
+
+    <g fill="#496f9c">
+      <rect x="225" y="83.5" width="54" height="286.5" rx="2"/>
+      <rect x="455" y="234.2" width="54" height="135.8" rx="2"/>
+      <rect x="685" y="121.6" width="54" height="248.4" rx="2"/>
+    </g>
+    <g fill="#bd6b4b">
+      <rect x="291" y="167.5" width="54" height="202.5" rx="2"/>
+      <rect x="521" y="302.5" width="54" height="67.5" rx="2"/>
+      <rect x="751" y="182.5" width="54" height="187.5" rx="2"/>
+    </g>
+
+    <g fill="#252a25" font-size="14" text-anchor="middle">
+      <text x="252" y="78">0.382</text>
+      <text x="318" y="162">0.270</text>
+      <text x="482" y="228">0.181</text>
+      <text x="548" y="297">0.090</text>
+      <text x="712" y="116">0.331</text>
+      <text x="778" y="177">0.250</text>
+    </g>
+    <g fill="#252a25" font-size="17" text-anchor="middle">
+      <text x="285" y="404">Formula</text>
+      <text x="515" y="404">Handwritten</text>
+      <text x="745" y="404">Printed</text>
+    </g>
+
+    <g transform="translate(560 442)">
+      <rect x="0" y="-13" width="16" height="16" rx="2" fill="#496f9c"/>
+      <text x="25" y="0" fill="#252a25" font-size="16">CRNN</text>
+      <rect x="118" y="-13" width="16" height="16" rx="2" fill="#bd6b4b"/>
+      <text x="143" y="0" fill="#252a25" font-size="16">Conformer + Guided CTC</text>
+    </g>
+  </g>
+</svg>

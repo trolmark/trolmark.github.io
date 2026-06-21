@@ -1,0 +1,29 @@
+{{ range .Site.Params.customCSS }}
+  {{ $styles := resources.Get . }}
+  {{ if $styles }}
+    {{ if hugo.IsServer }}
+      <link rel="stylesheet" href="{{ $styles.RelPermalink }}" media="screen">
+    {{ else }}
+      {{ $styles = $styles | resources.Minify | resources.Fingerprint }}
+      <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" crossorigin="anonymous" media="screen">
+    {{ end }}
+  {{ else }}
+    {{ warnf "customCSS resource not found: %q" . }}
+  {{ end }}
+{{ end }}
+
+{{ range .Site.Params.customSCSS }}
+  {{ $styles := resources.Get . }}
+  {{ if $styles }}
+    {{ if hugo.IsServer }}
+      {{ $cssOpts := dict "enableSourceMap" true }}
+      {{ $styles = $styles | toCSS $cssOpts }}
+      <link rel="stylesheet" href="{{ $styles.RelPermalink }}" media="screen">
+    {{ else }}
+      {{ $styles = $styles | toCSS | resources.Minify | resources.Fingerprint }}
+      <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" crossorigin="anonymous" media="screen">
+    {{ end }}
+  {{ else }}
+    {{ warnf "customSCSS resource not found: %q" . }}
+  {{ end }}
+{{ end }}

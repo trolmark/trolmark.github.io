@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>OCR on Andrii's Notes</title><link>http://localhost:1313/tags/ocr/</link><description>Recent content in OCR on Andrii's Notes</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Thu, 18 Jun 2026 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/ocr/index.xml" rel="self" type="application/rss+xml"/><item><title>Building a Compact Handwritten OCR Pipeline</title><link>http://localhost:1313/posts/handwritten_ocr/</link><pubDate>Thu, 18 Jun 2026 00:00:00 +0000</pubDate><guid>http://localhost:1313/posts/handwritten_ocr/</guid><description>&lt;h2 id="introduction"&gt;
+ Introduction
+ &lt;a class="heading-link" href="#introduction"&gt;
+ &lt;i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"&gt;&lt;/i&gt;
+ &lt;span class="sr-only"&gt;Link to heading&lt;/span&gt;
+ &lt;/a&gt;
+&lt;/h2&gt;
+&lt;p&gt;A while back, the &lt;a href="https://www.kaggle.com/competitions/handwritten-to-data" title="Handwritten to Data" class="external-link" target="_blank" rel="noopener"&gt;Handwritten to Data&lt;/a&gt; Kaggle
+competition focused on Ukrainian handwriting recognition. The dataset is
+publicly available on Hugging Face as &lt;code&gt;UkrainianCatholicUniversity/rukopys&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Part of my day job is on the deployment side of ML — &lt;strong&gt;porting and
+optimizing models to run on mobile phones&lt;/strong&gt;, where the recurring
+questions are &amp;ldquo;does this fit in memory?&amp;rdquo;, &amp;ldquo;does it hit the latency budget?&amp;rdquo;,
+and &amp;ldquo;does it run on the target hardware?&amp;rdquo;. Within that, I work mostly
+on document AI: page detection, document classification, image
+enhancement. Handwritten-text recognition, though, was a piece of the
+stack I had never built end-to-end myself. I treated this dataset as a
+chance to fill that gap while staying inside the constraints I optimize
+for at work.&lt;/p&gt;</description></item></channel></rss>

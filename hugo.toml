@@ -1,0 +1,77 @@
+baseURL = "http://localhost:1313/"
+title = "Andrii's Notes"
+theme = "hugo-coder"
+locale = "en-us"
+defaultContentLanguage = "en"
+enableRobotsTXT = true
+enableEmoji = true
+
+[pagination]
+pagerSize = 12
+
+[markup]
+[markup.highlight]
+noClasses = false
+lineNos = true
+lineNumbersInTable = false
+tabWidth = 4
+
+[markup.goldmark]
+[markup.goldmark.renderer]
+unsafe = true
+
+[markup.tableOfContents]
+startLevel = 2
+endLevel = 4
+ordered = true
+
+[params]
+author = "Andrii"
+info = "Technical notes, experiments, and long-form engineering writeups"
+description = "Technical blog by Andrii"
+keywords = "blog,software engineering,research,technical writing"
+dateFormat = "January 2006"
+since = 2026
+colorScheme = "light"
+hideColorSchemeToggle = false
+maxSeeAlsoItems = 5
+math = true
+katex = true
+customCSS = ["css/custom.css"]
+customSCSS = []
+customJS = []
+
+[taxonomies]
+category = "categories"
+series = "series"
+tag = "tags"
+author = "authors"
+
+[[params.social]]
+name = "GitHub"
+icon = "fa-brands fa-github fa-2x"
+weight = 1
+url = "https://github.com/your-github-username/"
+
+[[params.social]]
+name = "RSS"
+icon = "fa-solid fa-rss fa-2x"
+weight = 2
+url = "/index.xml"
+rel = "alternate"
+type = "application/rss+xml"
+
+[[menu.main]]
+name = "Posts"
+weight = 1
+url = "posts/"
+
+[[menu.main]]
+name = "Tags"
+weight = 2
+url = "tags/"
+
+[[menu.main]]
+name = "About"
+weight = 3
+url = "about/"

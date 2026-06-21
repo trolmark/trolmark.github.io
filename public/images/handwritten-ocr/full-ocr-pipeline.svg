@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1520" viewBox="0 0 1200 1520" role="img" aria-labelledby="title desc">
+  <title id="title">Full handwritten OCR pipeline</title>
+  <desc id="desc">Page image to ARUNet probability maps, postprocessing, line crops and masks, Conformer Guided CTC, joint decoder, and final transcription.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0 0L0 6L9 3z" fill="#607067"/></marker>
+    <style>
+      .title{font:600 30px Arial,sans-serif;fill:#252a25}.label{font:600 20px Arial,sans-serif;fill:#252a25}.small{font:15px Arial,sans-serif;fill:#566159}.surface{fill:#fff;stroke:#cbd4cc;stroke-width:2}.model{fill:#e4efea;stroke:#67927d;stroke-width:2}.decoder{fill:#f4e7de;stroke:#bd7959;stroke-width:2}.arrow{fill:none;stroke:#607067;stroke-width:2.5;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="1520" fill="#fbfaf4"/>
+  <text x="600" y="48" text-anchor="middle" class="title">Full handwritten OCR pipeline</text>
+
+  <rect x="500" y="78" width="200" height="245" rx="6" class="surface"/>
+  <image href="original-page.jpg" x="515" y="92" width="170" height="185" preserveAspectRatio="xMidYMid meet"/>
+  <text x="600" y="305" text-anchor="middle" class="label">Page image</text>
+  <path d="M600 338V378" class="arrow"/>
+
+  <rect x="370" y="392" width="460" height="82" rx="8" class="model"/>
+  <text x="600" y="426" text-anchor="middle" class="label">ARUNet detector</text>
+  <text x="600" y="453" text-anchor="middle" class="small">dense page geometry prediction</text>
+  <path d="M600 474V508H330V540" class="arrow"/>
+  <path d="M600 474V508H870V540" class="arrow"/>
+
+  <rect x="180" y="552" width="300" height="276" rx="6" class="surface"/>
+  <image href="line-probability.png" x="195" y="566" width="270" height="210" preserveAspectRatio="xMidYMid meet"/>
+  <text x="330" y="807" text-anchor="middle" class="label">Centerline probability</text>
+  <rect x="720" y="552" width="300" height="276" rx="6" class="surface"/>
+  <image href="separator_probability.png" x="735" y="566" width="270" height="210" preserveAspectRatio="xMidYMid meet"/>
+  <text x="870" y="807" text-anchor="middle" class="label">Separator probability</text>
+  <path d="M330 842V870H600V902" class="arrow"/>
+  <path d="M870 842V870H600V902" class="arrow"/>
+
+  <rect x="320" y="916" width="560" height="82" rx="8" class="model"/>
+  <text x="600" y="950" text-anchor="middle" class="label">Postprocessing</text>
+  <text x="600" y="977" text-anchor="middle" class="small">graph-based linking -&gt; watershed instances</text>
+  <path d="M600 998V1030" class="arrow"/>
+
+  <rect x="135" y="1044" width="420" height="138" rx="6" class="surface"/>
+  <image href="watershed-mask-bbox.jpg" x="150" y="1057" width="390" height="80" preserveAspectRatio="xMidYMid meet"/>
+  <text x="345" y="1163" text-anchor="middle" class="label">Line crop and mask</text>
+  <rect x="645" y="1044" width="420" height="138" rx="6" class="surface"/>
+  <image href="watershed-masked-recognition-crop.jpg" x="660" y="1057" width="390" height="80" preserveAspectRatio="xMidYMid meet"/>
+  <text x="855" y="1163" text-anchor="middle" class="label">Masked recognition crop</text>
+  <path d="M345 1197V1222H600V1254" class="arrow"/>
+  <path d="M855 1197V1222H600V1254" class="arrow"/>
+
+  <rect x="330" y="1268" width="540" height="82" rx="8" class="model"/>
+  <text x="600" y="1302" text-anchor="middle" class="label">Conformer + Guided CTC</text>
+  <text x="600" y="1329" text-anchor="middle" class="small">CTC logits + attention logits</text>
+  <path d="M600 1350V1384" class="arrow"/>
+
+  <rect x="330" y="1398" width="540" height="82" rx="8" class="decoder"/>
+  <text x="600" y="1432" text-anchor="middle" class="label">Joint decoder</text>
+  <text x="600" y="1459" text-anchor="middle" class="small">CTC + Attention + RNN-LM</text>
+  <path d="M600 1480V1503" class="arrow"/>
+  <text x="600" y="1517" text-anchor="middle" class="label">Final transcription</text>
+</svg>
