@@ -10,9 +10,9 @@ math = true
 
 ## Introduction
 
-A while back, the [Handwritten to Data][kaggle-handwritten-to-data] Kaggle
-competition focused on Ukrainian handwriting recognition. The dataset is
-publicly available on Hugging Face as `UkrainianCatholicUniversity/rukopys`.
+This project is my solution to the [Handwritten to Data][kaggle-handwritten-to-data]
+Kaggle competition for Ukrainian handwriting recognition. Its dataset is publicly
+available on Hugging Face as `UkrainianCatholicUniversity/rukopys`.
 
 Part of my day job is on the deployment side of ML — **porting and
 optimizing models to run on mobile phones**, where the recurring
@@ -588,6 +588,7 @@ The goal was not to make postprocessing more complex for its own sake. The goal 
 Result after Watershed:
 
 ```text
+Previous: 0.746
 ARUNet(watershed) + CRNN + greedy CTC: 0.771
 ```
 
@@ -656,6 +657,7 @@ reason the LM weight is a decoding hyperparameter, not a hard correction rule.
 Result after adding RNN-LM rescoring:
 
 ```text
+Previous: 0.771
 ARUNet + CRNN + joined CTC/LM rescoring: 0.794
 ```
 
@@ -722,6 +724,7 @@ Result: the recognizer improved across categories. The baseline CRNN had
 Result after Conformer + Guided CTC:
 
 ```text
+Previous: 0.794
 ARUNet + Conformer + Guided CTC: 0.804
 ```
 
@@ -755,6 +758,7 @@ Together, the Conformer recognizer, guided CTC training, and joint
 Attention/CTC/LM decoding improved the final score further:
 
 ```text
+Previous: 0.804
 ARUNet (watershed) + Conformer + Hybrid Decoder (CTC + Att + LM): 0.811
 ```
 

@@ -387,6 +387,43 @@ table tr:last-child td {
   object-fit: contain;
   background: var(--figure-bg);
   border: 1px solid var(--border);
+  cursor: zoom-in;
+}
+
+.image-zoom-dialog {
+  width: min(96vw, 140rem);
+  height: min(94vh, 120rem);
+  padding: 1.4rem;
+  overflow: hidden;
+  background: var(--figure-bg);
+  border: 1px solid var(--border);
+}
+
+.image-zoom-dialog::backdrop {
+  background: rgba(20, 25, 22, 0.78);
+}
+
+.image-zoom-dialog img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.image-zoom-close {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 3.2rem;
+  height: 3.2rem;
+  padding: 0;
+  color: #ffffff;
+  font-size: 2.8rem;
+  line-height: 1;
+  background: rgba(20, 25, 22, 0.78);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 @media (max-width: 900px) {

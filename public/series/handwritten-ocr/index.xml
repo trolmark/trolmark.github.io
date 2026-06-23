@@ -5,9 +5,9 @@
  &lt;span class="sr-only"&gt;Link to heading&lt;/span&gt;
  &lt;/a&gt;
 &lt;/h2&gt;
-&lt;p&gt;A while back, the &lt;a href="https://www.kaggle.com/competitions/handwritten-to-data" title="Handwritten to Data" class="external-link" target="_blank" rel="noopener"&gt;Handwritten to Data&lt;/a&gt; Kaggle
-competition focused on Ukrainian handwriting recognition. The dataset is
-publicly available on Hugging Face as &lt;code&gt;UkrainianCatholicUniversity/rukopys&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This project is my solution to the &lt;a href="https://www.kaggle.com/competitions/handwritten-to-data" title="Handwritten to Data" class="external-link" target="_blank" rel="noopener"&gt;Handwritten to Data&lt;/a&gt;
+Kaggle competition for Ukrainian handwriting recognition. Its dataset is publicly
+available on Hugging Face as &lt;code&gt;UkrainianCatholicUniversity/rukopys&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Part of my day job is on the deployment side of ML — &lt;strong&gt;porting and
 optimizing models to run on mobile phones&lt;/strong&gt;, where the recurring
 questions are &amp;ldquo;does this fit in memory?&amp;rdquo;, &amp;ldquo;does it hit the latency budget?&amp;rdquo;,

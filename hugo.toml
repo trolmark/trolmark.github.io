@@ -39,7 +39,7 @@ math = true
 katex = true
 customCSS = ["css/custom.css"]
 customSCSS = []
-customJS = []
+customJS = ["js/image-zoom.js"]
 
 [taxonomies]
 category = "categories"
