@@ -44,7 +44,7 @@ C \leftarrow \alpha AA^{\mathsf T} + \beta C.
 $$
 
 SYRK reuses the same core
-machinery as **GEMM** ( General Matrix Matrix product ) — packing, cache blocking, and a dense
+machinery as **GEMM** (General Matrix-Matrix Multiply) — packing, cache blocking, and a dense
 microkernel — but writes only one triangle of the symmetric result. That
 seemingly small difference reshapes the outer algorithm: it changes
 packed-panel reuse, diagonal handling, task layout, and load balancing.
@@ -188,7 +188,31 @@ isolated.
 
 I started with the most direct multithreaded solution: normalize every row,
 use an OpenMP loop over `i`, and compute every `i, j` pair with a plain dot
-product. It kept the machine busy — 19.8 hardware threads on average from 20 available — but
+product.
+
+```cpp
+void correlate(int ny, int nx, const float* data, float* result) {
+    std::vector<double> normalized(ny * nx);
+
+    // normalization-and-scale (omitted here)
+
+    #pragma omp parallel for schedule(dynamic, 1)
+    for (int i = 0; i < ny; ++i) {
+        const double* row_i = normalized.data() + i * nx;
+        for (int j = 0; j < i; ++j) {
+            const double* row_j = normalized.data() + j * nx;
+            double correlation = 0.0;
+            for (int x = 0; x < nx; ++x) {
+                correlation += row_i[x] * row_j[x];
+            }
+            result[i + j * ny] = static_cast<float>(correlation);
+        }
+        result[i + i * ny] = 1.0f;
+    }
+}
+```
+
+It kept the machine busy — 19.8 hardware threads on average from 20 available — but
 had no cache blocking, packing, or explicit SIMD.
 
 **First score.** That version took about `22.6 s`, or only `32 GFLOPS`.
@@ -599,14 +623,18 @@ The fix is almost embarrassing in hindsight: normalizing a row requires only
 its mean and its scale. Two small fp64 arrays, one entry per row, are enough.
 The packing step then reads each fp32 input value, converts it to fp64,
 applies `(x - mean[row]) * scale[row]`, and writes it directly into the
-packed layout. With AVX-512 SIMD instructions, the normalization looks like
-this; each line processes 8 values at once:
+packed layout.
 
 ```cpp
+// Once per row in this packing block, before the loop over k:
+const __m512d mean_v = _mm512_set1_pd(means[i]);   // broadcast scalar into 8 lanes
+const __m512d scale_v = _mm512_set1_pd(scales[i]); // broadcast scalar into 8 lanes
+
+// For each chunk of 8 input values in row i:
 const __m256 raw = _mm256_loadu_ps(row_ptr[i] + k); // raw = 8 input values
 const __m512d x = _mm512_cvtps_pd(raw);             // x = fp64(raw)
-const __m512d centered = _mm512_sub_pd(x, mean_v[i]); // x - mean[row]
-v[i] = _mm512_mul_pd(centered, scale_v[i]);         // centered * scale[row]
+const __m512d centered = _mm512_sub_pd(x, mean_v); // x - mean[row]
+v[i] = _mm512_mul_pd(centered, scale_v);           // centered * scale[row]
 ```
 
 *Normalize-then-pack versus normalization fused into packing.*
